@@ -1,0 +1,9 @@
+# Sistema
+Thumbs.db
+Desktop.ini
+*.log
+.DS_Store
+
+# Entorno
+.env
+.env.local
