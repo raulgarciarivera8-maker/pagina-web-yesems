@@ -19,7 +19,18 @@
 
   // ---------- init Supabase client (si hay llaves) ----------
   if (REAL && window.supabase) {
-    supa = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    supa = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,        // guarda la sesión en localStorage
+        autoRefreshToken: true,      // renueva el token solo
+        detectSessionInUrl: true,    // procesa el ?code= que regresa de Google
+        flowType: 'pkce'             // flujo recomendado y estable para OAuth
+      }
+    });
+  } else if (REAL && !window.supabase) {
+    // La librería de Supabase no cargó (¿bloqueada por la red / orden de scripts?)
+    console.error('[YESEMS_AUTH] La librería de Supabase no está disponible. ' +
+      'Verifica que el <script> de @supabase/supabase-js cargue ANTES de auth.js.');
   }
 
   function notify() { listeners.forEach((cb) => { try { cb(currentUser); } catch (e) {} }); }
@@ -67,7 +78,11 @@
     if (REAL) {
       const { error } = await supa.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.href.split('#')[0] }
+        options: {
+          // Regresa a una URL limpia (sin #hash ni ?query) que debe estar
+          // en la lista de "Redirect URLs" de Supabase.
+          redirectTo: window.location.origin + window.location.pathname
+        }
       });
       if (error) throw error;
       return; // redirige a Google
@@ -79,8 +94,29 @@
   }
 
   async function logout() {
-    if (REAL) { await supa.auth.signOut(); }
-    else { demoClear(); currentUser = null; notify(); }
+    if (REAL) {
+      if (!supa) { currentUser = null; notify(); return; }
+      try {
+        // scope global: cierra sesión en el servidor (todos los dispositivos)
+        const { error } = await supa.auth.signOut();
+        if (error) throw error;
+      } catch (e) {
+        // signOut puede fallar si la sesión ya expiró/no existe en el servidor
+        // o si no hay conexión. Aun así limpiamos la sesión LOCAL para que el
+        // usuario quede deslogueado en este navegador.
+        console.warn('[YESEMS_AUTH] signOut falló, limpiando localmente:', e.message);
+        try { await supa.auth.signOut({ scope: 'local' }); } catch (_) {}
+      }
+      // GARANTÍA de UI: forzamos el estado deslogueado aunque el evento
+      // onAuthStateChange tarde o no dispare.
+      currentUser = null;
+      notify();
+    } else {
+      demoClear(); currentUser = null; notify();
+    }
+    // cierra el menú de cuenta si quedó abierto
+    const menu = document.getElementById('acctMenu');
+    if (menu) menu.hidden = true;
   }
 
   // ======================================================
@@ -88,18 +124,43 @@
   // ======================================================
   async function boot() {
     if (REAL) {
-      const { data } = await supa.auth.getSession();
-      currentUser = data.session ? mapUser(data.session.user) : null;
+      if (!supa) { notify(); return; }
+      try {
+        const { data, error } = await supa.auth.getSession();
+        if (error) console.warn('[YESEMS_AUTH] getSession:', error.message);
+        currentUser = data && data.session ? mapUser(data.session.user) : null;
+      } catch (e) {
+        console.warn('[YESEMS_AUTH] No se pudo leer la sesión:', e.message);
+        currentUser = null;
+      }
       notify();
-      supa.auth.onAuthStateChange((_evt, session) => {
+      supa.auth.onAuthStateChange((evt, session) => {
         currentUser = session ? mapUser(session.user) : null;
         notify();
         if (session) closeModal();
+        // Al iniciar sesión vía Google, limpia el ?code=/#token de la URL
+        if (evt === 'SIGNED_IN') cleanAuthParamsFromUrl();
       });
+      // Si volvimos de Google, la lib procesa el code de forma asíncrona;
+      // limpiamos la URL una vez resuelto.
+      if (/[?#].*(code=|access_token=|error=)/.test(window.location.href)) {
+        setTimeout(cleanAuthParamsFromUrl, 600);
+      }
     } else {
       currentUser = demoLoad();
       notify();
     }
+  }
+
+  // Quita los parámetros de OAuth de la barra de direcciones sin recargar.
+  function cleanAuthParamsFromUrl() {
+    try {
+      const clean = window.location.origin + window.location.pathname;
+      if (window.location.href !== clean &&
+          /[?#].*(code=|access_token=|refresh_token=|error=|provider_token=)/.test(window.location.href)) {
+        window.history.replaceState({}, document.title, clean);
+      }
+    } catch (e) {}
   }
   function mapUser(u) {
     return {
@@ -290,8 +351,12 @@
       const btn = slot.querySelector('#acctBtn');
       const menu = slot.querySelector('#acctMenu');
       btn.addEventListener('click', (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; });
-      document.addEventListener('click', () => { if (menu) menu.hidden = true; });
-      slot.querySelector('#acctLogout').addEventListener('click', () => logout());
+      slot.querySelector('#acctLogout').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        menu.hidden = true;
+        logout();
+      });
     } else {
       slot.innerHTML = `<button class="acct-login" id="acctLogin" type="button">Iniciar sesión</button>`;
       slot.querySelector('#acctLogin').addEventListener('click', () => openModal('login'));
@@ -300,6 +365,19 @@
 
   // re-render header auth whenever header (re)mounts or user changes
   onChange((u) => renderHeaderAuth(u));
+
+  // Cierre del menú de cuenta al hacer clic fuera o con Escape.
+  // Se registra UNA sola vez (evita la fuga de listeners por repintado).
+  document.addEventListener('click', () => {
+    const menu = document.getElementById('acctMenu');
+    if (menu && !menu.hidden) menu.hidden = true;
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const menu = document.getElementById('acctMenu');
+      if (menu && !menu.hidden) menu.hidden = true;
+    }
+  });
   // header is injected by partials.js after DOMContentLoaded; observe for the slot
   function tryRender() { renderHeaderAuth(currentUser); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryRender);
@@ -307,6 +385,28 @@
   // also retry shortly after, in case partials.js mounts later
   setTimeout(tryRender, 0);
   setTimeout(tryRender, 300);
+
+  // GARANTÍA: espera a que aparezca el slot #ys-auth (lo inyecta partials.js
+  // de forma asíncrona) y entonces pinta el estado de sesión UNA vez.
+  // IMPORTANTE: el observer se DESCONECTA en cuanto encuentra el slot. Si no,
+  // como renderHeaderAuth modifica el DOM (slot.innerHTML), cada repintado
+  // dispararía el observer otra vez → bucle infinito que congela la página.
+  (function watchAuthSlot() {
+    if (document.getElementById('ys-auth')) { tryRender(); return; }
+    const obs = new MutationObserver(() => {
+      if (document.getElementById('ys-auth')) {
+        obs.disconnect();   // <-- corta el ciclo antes de tocar el DOM
+        tryRender();
+      }
+    });
+    const start = () => {
+      // por si el slot apareció entre el chequeo inicial y aquí
+      if (document.getElementById('ys-auth')) { tryRender(); return; }
+      obs.observe(document.body, { childList: true, subtree: true });
+    };
+    if (document.body) start();
+    else document.addEventListener('DOMContentLoaded', start);
+  })();
 
   // ---------- export ----------
   window.YESEMS_AUTH = { getUser, onChange, openModal, logout, isReal: () => REAL };
