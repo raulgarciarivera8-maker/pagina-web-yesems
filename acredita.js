@@ -63,12 +63,17 @@
     grid.innerHTML = AREAS.map((a) => {
       const data = window.modulesData[a.key] || { subsections: [] };
       const total = data.subsections ? data.subsections.reduce((s, x) => s + x.topics.length, 0) : 0;
+      const ready = areaHasMaterials(data);
+      const badge = ready
+        ? `<span class="area-status ready">PDF + examen</span>`
+        : `<span class="area-status prep">Próximamente</span>`;
       return `
         <button class="area-btn" data-key="${a.key}" style="--area-c:${a.color}">
           <span class="area-num">Área ${a.num}</span>
           <span class="area-icon">${AREA_ICONS[a.key]}</span>
           <h3>${a.label}</h3>
           <div class="meta">${total} temas · ${data.reactivos || '30 reactivos'}</div>
+          ${badge}
         </button>`;
     }).join('');
   }
@@ -109,6 +114,20 @@
 
     const tQuiz = (window.topicQuizzes && window.topicQuizzes[t.n]) || null;
     if (tQuiz && tQuiz.length) body += renderTopicExam(t.n, tQuiz);
+
+    // Si el tema aún no tiene PDF ni examen, avisamos en lugar de dejarlo "a medias"
+    if (!pdfPath && !(tQuiz && tQuiz.length)) {
+      body += `
+        <div class="topic-prep">
+          <span class="topic-prep-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <div class="topic-prep-txt">
+            <strong>Material en preparación</strong>
+            <span>El PDF de estudio y el examen de práctica de este tema estarán disponibles muy pronto.</span>
+          </div>
+        </div>`;
+    }
 
     return `
       <div class="topic" data-n="${t.n}">
@@ -217,6 +236,16 @@
     if (!data) { panel.innerHTML = '<p style="text-align:center;color:var(--ink-mute);padding:40px">Próximamente disponible.</p>'; return; }
     const area = AREAS.find((a) => a.key === key) || AREAS[0];
     const total = data.subsections.reduce((s, x) => s + x.topics.length, 0);
+    const prepBanner = areaHasMaterials(data) ? '' : `
+      <div class="area-prep-banner">
+        <span class="area-prep-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </span>
+        <div>
+          <strong>Estamos preparando esta área</strong>
+          <span>El temario ya está disponible. Los PDFs descargables y los exámenes de práctica de esta área se publicarán muy pronto.</span>
+        </div>
+      </div>`;
 
     const lockedTopic = (t) => `
       <div class="topic locked">
@@ -242,6 +271,7 @@
 
       <div class="locked-wrap">
         <div class="locked-list">
+          ${prepBanner}
           ${data.subsections.map((sub) => `
             <div class="subsection">
               <h3 class="subsection-title">${sub.title}<span class="tag">${sub.topics.length} temas</span></h3>
@@ -276,11 +306,29 @@
     else { renderAreaLocked(key); panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
 
+  function areaHasMaterials(data) {
+    return data.subsections.some((sub) => sub.topics.some((t) => {
+      const hasPdf = window.topicPDFs && window.topicPDFs[t.n];
+      const q = window.topicQuizzes && window.topicQuizzes[t.n];
+      return hasPdf || (q && q.length);
+    }));
+  }
+
   function renderArea(key) {
     const data = window.modulesData[key];
     if (!data) { panel.innerHTML = '<p style="text-align:center;color:var(--ink-mute);padding:40px">Próximamente disponible.</p>'; return; }
     const area = AREAS.find((a) => a.key === key) || AREAS[0];
     const total = data.subsections.reduce((s, x) => s + x.topics.length, 0);
+    const prepBanner = areaHasMaterials(data) ? '' : `
+      <div class="area-prep-banner">
+        <span class="area-prep-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </span>
+        <div>
+          <strong>Estamos preparando esta área</strong>
+          <span>Ya puedes consultar el temario y los conceptos clave. Los PDFs descargables y los exámenes de práctica con calificación estarán disponibles muy pronto.</span>
+        </div>
+      </div>`;
     panel.innerHTML = `
       <div class="area-panel-head">
         <div>
@@ -293,6 +341,7 @@
           <div>temas</div>
         </div>
       </div>
+      ${prepBanner}
       ${data.subsections.map((sub) => `
         <div class="subsection">
           <h3 class="subsection-title">${sub.title}<span class="tag">${sub.topics.length} temas</span></h3>

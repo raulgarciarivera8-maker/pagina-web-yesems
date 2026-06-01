@@ -29,9 +29,7 @@
   const NAV_ITEMS = [
     { key: 'inicio',                   label: 'Inicio',                  href: 'index.html' },
     { key: 'nosotros',                 label: 'Nosotros',                href: 'nosotros.html' },
-    { key: 'oferta-educativa',         label: 'Oferta Educativa',        href: 'oferta-educativa.html', caret: true },
     { key: 'acredita-bach',            label: 'Acredita-Bach',           href: 'acredita-bach.html' },
-    { key: 'certificaciones-conocer',  label: 'Certificaciones CONOCER', href: 'certificaciones-conocer.html', caret: true },
     { key: 'tecnologia-educativa',     label: 'Tecnología Educativa',    href: 'tecnologia-educativa.html', caret: true },
     { key: 'plataforma',               label: 'Plataforma',              href: 'plataforma.html' },
     { key: 'contacto',                 label: 'Contacto',                href: 'contacto.html' }
@@ -96,7 +94,6 @@
             <h4>Oferta</h4>
             <ul>
               <li><a href="acredita-bach.html">Acredita-Bach</a></li>
-              <li><a href="certificaciones-conocer.html">Certificaciones CONOCER</a></li>
               <li><a href="tecnologia-educativa.html">Tecnología Educativa</a></li>
               <li><a href="plataforma.html">Plataforma Digital</a></li>
             </ul>
