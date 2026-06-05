@@ -35,7 +35,7 @@
     { key: 'contacto',                 label: 'Contacto',                href: 'contacto.html' }
   ];
 
-  const WHATSAPP_URL = 'https://wa.me/5210000000000?text=Hola%20YES%20EMS';
+  const WHATSAPP_URL = 'https://api.whatsapp.com/send/?phone=5215648666596&text=%21Hola%21+Vengo+de+la+web+y+requiero+mas+informaci%C3%B3n+de+sus+productos&type=phone_number&app_absent=0';
 
   const NAV = `
     <nav class="nav" id="ysNav" aria-label="Principal">
