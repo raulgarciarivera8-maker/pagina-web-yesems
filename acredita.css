@@ -289,6 +289,13 @@
   align-items: stretch;
 }
 
+.subs-single {
+  grid-template-columns: 1fr;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .sub-card {
   position: relative;
   background: var(--surface);

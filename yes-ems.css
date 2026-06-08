@@ -529,6 +529,22 @@ button { font-family: inherit; cursor: pointer; }
 .footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .footer ul a { font-size: 13.5px; color: rgba(255,255,255,0.65); transition: color .2s ease; }
 .footer ul a:hover { color: var(--green-400); }
+.footer-social {
+  display: flex; gap: 12px; align-items: center;
+}
+.footer-social a {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+  text-decoration: none;
+}
+.footer-social a:hover {
+  background: var(--green-500);
+  color: #fff;
+  transform: translateY(-2px);
+}
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.1);
   padding-top: 18px;

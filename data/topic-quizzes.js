@@ -1,226 +1,408 @@
-// ============ QUIZZES POR TEMA (Pensamiento Científico) ============
-// Cada tema: 5 preguntas de opción múltiple con justificación.
+// ============ EXÁMENES DE PRÁCTICA POR TEMA (ACREDITA-BACH) ============
+// Reactivos oficiales extraídos de las guías de estudio CENEVAL.
 // Formato: { q: pregunta, options: [["A","texto"],...], correct: "A", just: "explicación" }
 
 window.topicQuizzes = {
+  // ===== Pensamiento Matemático =====
   1: [
-    { q: "¿Cuál es la unidad básica estructural y funcional de los seres vivos?", options: [["A","Tejido"],["B","Célula"],["C","Órgano"],["D","Molécula"]], correct: "B", just: "La célula es la unidad mínima que cumple funciones vitales (nutrición, relación, reproducción)." },
-    { q: "Organelo encargado de producir ATP mediante respiración celular:", options: [["A","Ribosoma"],["B","Lisosoma"],["C","Mitocondria"],["D","Cloroplasto"]], correct: "C", just: "La mitocondria realiza la fosforilación oxidativa que genera ATP." },
-    { q: "Diferencia clave entre célula procariota y eucariota:", options: [["A","Tamaño únicamente"],["B","Presencia de núcleo definido"],["C","Tener ADN"],["D","Tener membrana"]], correct: "B", just: "Las eucariotas poseen núcleo verdadero rodeado de membrana; las procariotas no." },
-    { q: "Estructura exclusiva de células vegetales:", options: [["A","Mitocondria"],["B","Membrana plasmática"],["C","Pared celular de celulosa"],["D","Ribosomas"]], correct: "C", just: "La pared celular de celulosa es característica vegetal; los animales no la presentan." },
-    { q: "Función principal del retículo endoplasmático rugoso:", options: [["A","Síntesis de lípidos"],["B","Síntesis de proteínas"],["C","Digestión celular"],["D","Almacén de agua"]], correct: "B", just: "Tiene ribosomas adheridos que sintetizan proteínas para exportación." }
+    {q:"¿Qué tipo de variable estadística es \"número de mascotas por hogar\"?",options:[["A","Continua"],["B","Discreta"],["C","Cualitativa"]],correct:"B",just:"Se cuenta con números enteros (0, 1, 2…); no admite valores intermedios."},
+    {q:"¿Qué muestreo elige salones completos al azar dentro de una escuela?",options:[["A","Estratificado"],["B","Sistemático"],["C","Por conglomerados"]],correct:"C",just:"Se eligen grupos completos (conglomerados) al azar."}
   ],
   2: [
-    { q: "El mecanismo central de la teoría evolutiva de Darwin es:", options: [["A","Uso y desuso"],["B","Selección natural"],["C","Mutación dirigida"],["D","Herencia de caracteres adquiridos"]], correct: "B", just: "Darwin propuso la selección natural: los individuos mejor adaptados sobreviven y se reproducen más." },
-    { q: "Las islas Galápagos fueron clave porque Darwin observó:", options: [["A","Animales idénticos a los del continente"],["B","Pinzones con picos adaptados a distintas dietas"],["C","Ausencia de vida"],["D","Solo plantas"]], correct: "B", just: "Las variaciones en los picos de los pinzones evidenciaron adaptación a distintos alimentos." },
-    { q: "Lamarck difería de Darwin porque proponía:", options: [["A","Selección natural"],["B","Herencia de caracteres adquiridos por uso"],["C","Que las especies son inmutables"],["D","Origen divino"]], correct: "B", just: "Lamarck pensaba que los rasgos desarrollados en vida se heredaban; Darwin lo refutó." },
-    { q: "Una evidencia fósil que respalda la evolución es:", options: [["A","Las pirámides"],["B","Formas transicionales como Archaeopteryx"],["C","Los meteoritos"],["D","La fotosíntesis"]], correct: "B", just: "Archaeopteryx muestra rasgos intermedios entre reptiles y aves." },
-    { q: "La obra clave de Darwin (1859) es:", options: [["A","Principia"],["B","El origen de las especies"],["C","La doble hélice"],["D","Sistema natural"]], correct: "B", just: "\"El origen de las especies\" expone la teoría de evolución por selección natural." }
+    {q:"Los datos 5, 7, 7, 9, 12 tienen como mediana:",options:[["A","7"],["B","8"],["C","9"]],correct:"A",just:"Ya están ordenados; el valor central (3.º de 5) es 7."},
+    {q:"El promedio de 6, 7, 7, 8, 9, 10 es:",options:[["A","7.5"],["B","7.83"],["C","8.0"]],correct:"B",just:"La suma es 47; 47 ÷ 6 = 7.83."},
+    {q:"¿Cuál es la moda del conjunto 3, 5, 5, 6, 9, 5, 8?",options:[["A","5"],["B","6"],["C","9"]],correct:"A",just:"El 5 aparece 3 veces, más que cualquier otro valor."}
   ],
   3: [
-    { q: "Padre de la genética por sus experimentos con chícharos:", options: [["A","Darwin"],["B","Mendel"],["C","Watson"],["D","Pasteur"]], correct: "B", just: "Gregor Mendel descubrió las leyes de la herencia con Pisum sativum." },
-    { q: "Un alelo dominante se expresa cuando:", options: [["A","Solo está en homocigosis"],["B","Está presente al menos una vez"],["C","Nunca se expresa"],["D","Solo en mitocondrias"]], correct: "B", just: "Con una sola copia (heterocigoto) ya enmascara al recesivo." },
-    { q: "Genotipo significa:", options: [["A","Aspecto físico"],["B","Conjunto de alelos"],["C","Tipo de célula"],["D","Sexo del individuo"]], correct: "B", just: "El genotipo es la combinación de alelos; el fenotipo es la manifestación visible." },
-    { q: "Cruza Aa × Aa produce proporción fenotípica:", options: [["A","1:1"],["B","3:1"],["C","9:3:3:1"],["D","2:1"]], correct: "B", just: "3 dominantes (AA, Aa, Aa) : 1 recesivo (aa)." },
-    { q: "El ADN se encuentra principalmente en:", options: [["A","Citoplasma"],["B","Núcleo"],["C","Membrana"],["D","Ribosomas"]], correct: "B", just: "El ADN nuclear contiene la mayor parte de la información hereditaria." }
+    {q:"La desviación estándar mide:",options:[["A","El valor más frecuente"],["B","Qué tan dispersos están los datos"],["C","El valor central"]],correct:"B",just:"Indica la separación promedio de los datos respecto de la media."}
   ],
   4: [
-    { q: "Biomolécula que constituye la principal reserva energética rápida:", options: [["A","Lípidos"],["B","Carbohidratos"],["C","Proteínas"],["D","Ácidos nucleicos"]], correct: "B", just: "La glucosa y el glucógeno son fuentes energéticas de uso inmediato." },
-    { q: "La unidad básica de las proteínas es:", options: [["A","Glucosa"],["B","Nucleótido"],["C","Aminoácido"],["D","Ácido graso"]], correct: "C", just: "Las proteínas son polímeros de aminoácidos unidos por enlaces peptídicos." },
-    { q: "Los lípidos se caracterizan por ser:", options: [["A","Solubles en agua"],["B","Insolubles en agua"],["C","Iónicos"],["D","Polares fuertes"]], correct: "B", just: "Son hidrofóbicos; solubles en solventes apolares." },
-    { q: "El ADN está formado por:", options: [["A","Aminoácidos"],["B","Nucleótidos"],["C","Monosacáridos"],["D","Ácidos grasos"]], correct: "B", just: "Cada nucleótido = azúcar (desoxirribosa) + fosfato + base nitrogenada." },
-    { q: "Las bases nitrogenadas del ADN son:", options: [["A","A, U, G, C"],["B","A, T, G, C"],["C","A, T, U, C"],["D","T, U, G, C"]], correct: "B", just: "El ADN usa Timina; el ARN usa Uracilo en su lugar." }
+    {q:"¿De cuántas formas se pueden ordenar 4 personas en una fila?",options:[["A","12"],["B","16"],["C","24"]],correct:"C",just:"4! = 4×3×2×1 = 24 (permutaciones: importa el orden)."},
+    {q:"¿Cuántas combinaciones de 3 elementos se forman de un conjunto de 6?",options:[["A","18"],["B","20"],["C","120"]],correct:"B",just:"C(6,3) = 720 ÷ 36 = 20 (no importa el orden)."}
   ],
   5: [
-    { q: "Modelo atómico que propuso electrones en órbitas fijas:", options: [["A","Dalton"],["B","Thomson"],["C","Bohr"],["D","Rutherford"]], correct: "C", just: "Bohr (1913) propuso niveles de energía cuantizados para los electrones." },
-    { q: "El modelo del 'pudín con pasas' fue propuesto por:", options: [["A","Dalton"],["B","Thomson"],["C","Rutherford"],["D","Schrödinger"]], correct: "B", just: "Thomson imaginó electrones incrustados en una masa positiva." },
-    { q: "Rutherford descubrió, con su experimento de la lámina de oro:", options: [["A","El neutrón"],["B","Que el átomo es mayormente vacío con núcleo denso"],["C","La fisión nuclear"],["D","El electrón"]], correct: "B", just: "La dispersión de partículas alfa reveló un núcleo pequeño y muy denso." },
-    { q: "El modelo cuántico actual describe al electrón como:", options: [["A","Una partícula en órbita fija"],["B","Una onda en orbital probabilístico"],["C","Un punto inmóvil"],["D","Una pasa dentro de un pudín"]], correct: "B", just: "Schrödinger y Heisenberg describieron orbitales (zonas de probabilidad)." },
-    { q: "Número atómico (Z) corresponde a:", options: [["A","Número de protones"],["B","Número de neutrones"],["C","Suma de protones y neutrones"],["D","Número de electrones de valencia"]], correct: "A", just: "Z identifica al elemento y es el número de protones del núcleo." }
+    {q:"Se lanzan dos dados. ¿Probabilidad de obtener suma igual a 7?",options:[["A","1/12"],["B","1/6"],["C","1/9"]],correct:"B",just:"De 36 resultados, 6 suman 7; P = 6/36 = 1/6."},
+    {q:"En una bolsa hay 8 verdes de un total de 24 pelotas. ¿Probabilidad de verde?",options:[["A","12.5%"],["B","16.6%"],["C","33.3%"]],correct:"C",just:"P = 8/24 = 0.333 = 33.3%."},
+    {q:"Se extrae una carta de una baraja de 52 (13 corazones). ¿Probabilidad de corazón?",options:[["A","1/13"],["B","1/4"],["C","1/2"]],correct:"B",just:"P = 13/52 = 1/4 = 25%."}
   ],
   6: [
-    { q: "Enlace formado por transferencia de electrones entre metal y no metal:", options: [["A","Covalente"],["B","Iónico"],["C","Metálico"],["D","De hidrógeno"]], correct: "B", just: "El metal cede electrones y el no metal los acepta formando iones." },
-    { q: "El enlace covalente se forma cuando:", options: [["A","Se transfieren electrones"],["B","Se comparten electrones"],["C","Hay metales únicamente"],["D","Hay solo iones"]], correct: "B", just: "Dos no metales comparten pares de electrones para alcanzar el octeto." },
-    { q: "El NaCl es un compuesto:", options: [["A","Covalente"],["B","Iónico"],["C","Metálico"],["D","Puro elemento"]], correct: "B", just: "Na cede 1 electrón al Cl: forma Na⁺ y Cl⁻ unidos por atracción electrostática." },
-    { q: "La 'mar de electrones' caracteriza al enlace:", options: [["A","Iónico"],["B","Covalente polar"],["C","Metálico"],["D","Puente de hidrógeno"]], correct: "C", just: "Los electrones de valencia están deslocalizados entre cationes metálicos." },
-    { q: "El agua (H₂O) tiene enlaces:", options: [["A","Iónicos"],["B","Covalentes polares"],["C","Metálicos"],["D","Apolares"]], correct: "B", just: "El oxígeno es más electronegativo que el H y atrae más los electrones compartidos." }
+    {q:"De 40 personas que hacen ejercicio, 30 tienen buena salud. ¿P(salud|ejercicio)?",options:[["A","30%"],["B","75%"],["C","40%"]],correct:"B",just:"P(A|B) = 30 ÷ 40 = 0.75 = 75%."}
   ],
   7: [
-    { q: "El estado en que las partículas tienen forma y volumen definidos es:", options: [["A","Sólido"],["B","Líquido"],["C","Gas"],["D","Plasma"]], correct: "A", just: "En el sólido las partículas vibran sin desplazarse: hay orden y rigidez." },
-    { q: "Cambio de líquido a gas se llama:", options: [["A","Fusión"],["B","Condensación"],["C","Evaporación"],["D","Sublimación"]], correct: "C", just: "La evaporación (o vaporización) ocurre al absorber energía." },
-    { q: "Pasar directamente de sólido a gas es:", options: [["A","Fusión"],["B","Sublimación"],["C","Solidificación"],["D","Condensación"]], correct: "B", just: "Sublimación: ejemplo, el hielo seco (CO₂ sólido)." },
-    { q: "En un gas, las partículas:", options: [["A","Están muy ordenadas"],["B","Se mueven libremente y ocupan todo el volumen"],["C","No tienen energía"],["D","Vibran sin moverse"]], correct: "B", just: "Los gases no tienen forma ni volumen propios; las partículas se mueven al azar." },
-    { q: "El cuarto estado de la materia es:", options: [["A","Sólido amorfo"],["B","Plasma"],["C","Líquido viscoso"],["D","Gel"]], correct: "B", just: "El plasma es un gas ionizado, presente en estrellas y rayos." }
+    {q:"Una renta de auto cuesta $2,500 fijos más $10 por km. Si el total fue $4,000:",options:[["A","500 + 10k = 4000"],["B","2500 + 10k = 4000"],["C","2500 + 50k = 4000"]],correct:"B",just:"Costo fijo (2500) + costo variable (10 por km) = total (4000)."}
   ],
   8: [
-    { q: "Un cuerpo flota cuando:", options: [["A","Su densidad > a la del fluido"],["B","Su densidad < a la del fluido"],["C","Pesa mucho"],["D","Es grande"]], correct: "B", just: "Principio de Arquímedes: flota si su densidad es menor que la del fluido." },
-    { q: "La fuerza que se opone al movimiento entre superficies en contacto es:", options: [["A","Gravedad"],["B","Fricción"],["C","Empuje"],["D","Tensión"]], correct: "B", just: "La fricción actúa paralela a las superficies, oponiéndose al movimiento." },
-    { q: "Un cuerpo está en equilibrio cuando la suma de fuerzas es:", options: [["A","Positiva"],["B","Cero"],["C","Negativa"],["D","Variable"]], correct: "B", just: "Primera ley de Newton: ΣF = 0 implica reposo o velocidad constante." },
-    { q: "La fricción cinética es:", options: [["A","Mayor que la estática"],["B","Menor que la estática"],["C","Igual a la gravedad"],["D","Inexistente"]], correct: "B", just: "Cuesta más iniciar el movimiento que mantenerlo: μₑ > μc." },
-    { q: "Principio de Arquímedes: el empuje es igual a:", options: [["A","El peso del cuerpo"],["B","El peso del fluido desalojado"],["C","La densidad del cuerpo"],["D","El volumen total"]], correct: "B", just: "E = ρ_fluido × V_desalojado × g." }
+    {q:"Factoriza x² − 9.",options:[["A","(x−3)(x−3)"],["B","(x+3)(x−3)"],["C","(x+9)(x−1)"]],correct:"B",just:"Diferencia de cuadrados: a² − b² = (a+b)(a−b)."},
+    {q:"Desarrolla (x − 5)².",options:[["A","x² − 25"],["B","x² − 10x + 25"],["C","x² + 10x + 25"]],correct:"B",just:"(a−b)² = a² − 2ab + b² = x² − 10x + 25."}
   ],
   9: [
-    { q: "El impulso nervioso es de naturaleza:", options: [["A","Química únicamente"],["B","Electroquímica"],["C","Mecánica"],["D","Térmica"]], correct: "B", just: "Las neuronas transmiten señales por cambios de potencial y neurotransmisores." },
-    { q: "La temperatura corporal humana se regula por:", options: [["A","Riñones"],["B","Hipotálamo"],["C","Hígado"],["D","Estómago"]], correct: "B", just: "El hipotálamo actúa como termostato corporal." },
-    { q: "El sudor enfría al cuerpo porque:", options: [["A","Es frío al salir"],["B","Su evaporación absorbe calor"],["C","Aumenta la masa"],["D","Crea fricción"]], correct: "B", just: "El cambio de fase líquido→gas requiere energía que toma de la piel." },
-    { q: "Los animales homeotermos:", options: [["A","Cambian su temperatura con el ambiente"],["B","Mantienen temperatura constante"],["C","No regulan temperatura"],["D","Solo viven en frío"]], correct: "B", just: "Mamíferos y aves regulan su temperatura interna independientemente del ambiente." },
-    { q: "La sinapsis es:", options: [["A","Una célula muscular"],["B","La unión funcional entre dos neuronas"],["C","Un órgano"],["D","Un hueso"]], correct: "B", just: "Punto de comunicación donde se libera el neurotransmisor." }
+    {q:"Las raíces de x² − 7x + 10 = 0 son:",options:[["A","2 y 5"],["B","1 y 10"],["C","−2 y −5"]],correct:"A",just:"Dos números que multiplican 10 y suman 7: 2 y 5."},
+    {q:"Resolver 5x + 3 = 2x + 18.",options:[["A","x = 5"],["B","x = 3"],["C","x = 7"]],correct:"A",just:"5x − 2x = 18 − 3 → 3x = 15 → x = 5."}
   ],
   10: [
-    { q: "Tecnología médica usada para visualizar tejidos internos sin cirugía:", options: [["A","Termómetro"],["B","Resonancia magnética"],["C","Estetoscopio"],["D","Báscula"]], correct: "B", just: "La RM usa campos magnéticos para imágenes detalladas de tejidos blandos." },
-    { q: "Las vacunas funcionan al:", options: [["A","Matar virus en sangre"],["B","Entrenar al sistema inmune con antígenos debilitados"],["C","Aumentar temperatura"],["D","Inhibir neuronas"]], correct: "B", just: "Generan memoria inmunológica sin causar enfermedad grave." },
-    { q: "Avance biotecnológico que permite editar genes con precisión:", options: [["A","PCR"],["B","CRISPR"],["C","Microscopio óptico"],["D","Anestesia"]], correct: "B", just: "CRISPR/Cas9 corta el ADN en sitios específicos para editar genomas." },
-    { q: "Antibiótico descubierto por Fleming (1928):", options: [["A","Aspirina"],["B","Penicilina"],["C","Insulina"],["D","Morfina"]], correct: "B", just: "La penicilina, del hongo Penicillium, revolucionó la medicina." },
-    { q: "Una aplicación de los rayos X es:", options: [["A","Cocinar alimentos"],["B","Diagnóstico médico"],["C","Producir oxígeno"],["D","Detectar olores"]], correct: "B", just: "Los rayos X atraviesan tejidos blandos pero no los huesos: revelan fracturas." }
+    {q:"En el sistema x + y = 12 ; 2x − y = 3, el valor de x es:",options:[["A","5"],["B","7"],["C","9"]],correct:"A",just:"Sumando ambas: 3x = 15 → x = 5 (y = 7)."}
   ],
   11: [
-    { q: "Un cambio químico se reconoce por:", options: [["A","Cambio de forma"],["B","Aparición de nuevas sustancias"],["C","Cambio de estado"],["D","Cambio de tamaño"]], correct: "B", just: "Hay reacción cuando se forman compuestos con propiedades diferentes." },
-    { q: "La oxidación del hierro produce:", options: [["A","Plomo"],["B","Óxido de hierro"],["C","Vapor de agua"],["D","Aluminio"]], correct: "B", just: "Fe + O₂ → Fe₂O₃ (herrumbre rojiza)." },
-    { q: "Ley de conservación de la masa fue establecida por:", options: [["A","Newton"],["B","Lavoisier"],["C","Mendeléyev"],["D","Bohr"]], correct: "B", just: "Lavoisier: \"la materia no se crea ni se destruye, solo se transforma\"." },
-    { q: "Una reacción de combustión requiere:", options: [["A","Solo combustible"],["B","Combustible + oxígeno + calor"],["C","Solo oxígeno"],["D","Agua"]], correct: "B", just: "El triángulo del fuego: comburente, combustible y energía de activación." },
-    { q: "Un indicador de cambio físico (no químico) es:", options: [["A","Romper papel"],["B","Quemar papel"],["C","Oxidar hierro"],["D","Cocer un huevo"]], correct: "A", just: "Romper papel no altera su composición química, solo su forma." }
+    {q:"Un capital de $8,000 a interés simple del 4% anual durante 2 años genera:",options:[["A","$320"],["B","$640"],["C","$800"]],correct:"B",just:"I = 8000 × 0.04 × 2 = $640."}
   ],
   12: [
-    { q: "Para separar arena de agua se usa:", options: [["A","Destilación"],["B","Filtración"],["C","Imán"],["D","Cromatografía"]], correct: "B", just: "La filtración separa sólidos insolubles de un líquido mediante un medio poroso." },
-    { q: "Para separar sal disuelta en agua se usa:", options: [["A","Filtración"],["B","Evaporación o destilación"],["C","Imantación"],["D","Decantación"]], correct: "B", just: "Al evaporar el agua queda la sal como residuo sólido." },
-    { q: "La decantación se usa para:", options: [["A","Líquidos miscibles"],["B","Líquidos inmiscibles o sólido y líquido"],["C","Gases"],["D","Imanes"]], correct: "B", just: "Aprovecha la diferencia de densidad: agua-aceite, por ejemplo." },
-    { q: "Para separar limaduras de hierro de arena se utiliza:", options: [["A","Filtración"],["B","Imantación"],["C","Destilación"],["D","Cromatografía"]], correct: "B", just: "Solo el hierro es ferromagnético; el imán lo atrae y separa." },
-    { q: "Cromatografía permite separar:", options: [["A","Sólidos grandes"],["B","Pigmentos o componentes por afinidad"],["C","Gases nobles"],["D","Solo agua"]], correct: "B", just: "Usa fase móvil + fase estacionaria; aplicada en tinta, sangre, drogas." }
+    {q:"¿Cuál es el MCM de 6 y 8?",options:[["A","2"],["B","24"],["C","48"]],correct:"B",just:"6 = 2·3 ; 8 = 2³. MCM = 2³·3 = 24."},
+    {q:"¿Cuál es el MCD de 24 y 36?",options:[["A","6"],["B","12"],["C","72"]],correct:"B",just:"24 = 2³·3 ; 36 = 2²·3². MCD = 2²·3 = 12."}
   ],
   13: [
-    { q: "Principal causa del calentamiento global:", options: [["A","Aumento de gases de efecto invernadero"],["B","Erupciones solares"],["C","Más nubes"],["D","Menos plantas marinas"]], correct: "A", just: "CO₂ y metano por combustibles fósiles atrapan más radiación infrarroja." },
-    { q: "El smog en ciudades afecta principalmente al sistema:", options: [["A","Óseo"],["B","Respiratorio"],["C","Endócrino"],["D","Reproductor"]], correct: "B", just: "Partículas y ozono troposférico irritan vías y pulmones." },
-    { q: "La capa de ozono protege la vida porque:", options: [["A","Genera oxígeno"],["B","Filtra rayos UV"],["C","Calienta la Tierra"],["D","Refleja la luna"]], correct: "B", just: "El O₃ estratosférico absorbe la radiación ultravioleta dañina." },
-    { q: "El reciclaje busca:", options: [["A","Quemar más residuos"],["B","Reincorporar materiales y reducir residuos"],["C","Acumular basura"],["D","Aumentar minería"]], correct: "B", just: "Disminuye extracción de recursos y residuos en vertederos." },
-    { q: "Bioacumulación se refiere a:", options: [["A","Crecer rápido"],["B","Concentración creciente de contaminantes en la cadena alimentaria"],["C","Acumular plantas"],["D","Multiplicación de células"]], correct: "B", just: "Mercurio o DDT se concentran al subir niveles tróficos." }
+    {q:"La sucesión 5, 10, 20, 40… es:",options:[["A","Aritmética de razón 5"],["B","Geométrica de razón 2"],["C","Aritmética de razón 10"]],correct:"B",just:"Cada término se multiplica por 2 (geométrica)."}
   ],
   14: [
-    { q: "Un organismo transgénico es aquel que:", options: [["A","Vive mucho tiempo"],["B","Tiene un gen de otra especie"],["C","Solo se reproduce sexualmente"],["D","Es estéril"]], correct: "B", just: "Se le ha incorporado ADN externo (ej. maíz Bt con gen bacteriano)." },
-    { q: "Dolly (1996) fue famosa por ser:", options: [["A","Una vaca transgénica"],["B","El primer mamífero clonado"],["C","Una planta híbrida"],["D","Un perro modificado"]], correct: "B", just: "Oveja clonada por transferencia nuclear en el Roslin Institute." },
-    { q: "CRISPR/Cas9 es una herramienta para:", options: [["A","Detectar virus"],["B","Editar genes con precisión"],["C","Clonar células"],["D","Medir temperatura"]], correct: "B", just: "Cas9 corta el ADN en una secuencia guiada por ARN; permite editar." },
-    { q: "Un riesgo ético de la manipulación genética es:", options: [["A","Resistencia a enfermedades"],["B","Bebés a la carta o desigualdad"],["C","Mejor cosecha"],["D","Menor costo"]], correct: "B", just: "Modificar embriones humanos plantea dilemas de eugenesia y equidad." },
-    { q: "Un beneficio agrícola del cultivo transgénico es:", options: [["A","Más plagas"],["B","Resistencia a plagas o sequía"],["C","Sabor más amargo"],["D","Menor productividad"]], correct: "B", just: "Por ejemplo, maíz Bt resiste el gusano cogollero sin pesticidas." }
+    {q:"Si 4 obreros tardan 6 días, ¿cuántos días tardarían 8 obreros?",options:[["A","12 días"],["B","3 días"],["C","6 días"]],correct:"B",just:"Proporcionalidad inversa: 4×6 = 24; 24 ÷ 8 = 3 días."},
+    {q:"¿Cuánto es el 30% de 250?",options:[["A","60"],["B","75"],["C","80"]],correct:"B",just:"0.30 × 250 = 75."}
   ],
   15: [
-    { q: "La fuerza que mantiene a los planetas orbitando al Sol es:", options: [["A","Magnetismo"],["B","Gravedad"],["C","Tensión"],["D","Fricción"]], correct: "B", just: "Ley de gravitación universal de Newton: F = G·m₁·m₂ / r²." },
-    { q: "El planeta más cercano al Sol es:", options: [["A","Venus"],["B","Mercurio"],["C","Marte"],["D","Tierra"]], correct: "B", just: "Mercurio orbita a ~58 millones de km del Sol." },
-    { q: "Las estaciones del año se deben a:", options: [["A","Distancia al Sol"],["B","Inclinación del eje terrestre"],["C","La Luna"],["D","Velocidad de la Tierra"]], correct: "B", just: "La inclinación de 23.5° hace que los rayos lleguen más directos o inclinados según la época." },
-    { q: "Kepler descubrió que las órbitas planetarias son:", options: [["A","Circulares"],["B","Elípticas"],["C","Cuadradas"],["D","Espirales"]], correct: "B", just: "Primera ley de Kepler: órbitas elípticas con el Sol en un foco." },
-    { q: "La Vía Láctea es:", options: [["A","Un sistema solar"],["B","Una galaxia"],["C","Una nebulosa"],["D","Un asteroide"]], correct: "B", just: "Galaxia espiral que contiene al Sistema Solar y ~200 mil millones de estrellas." }
+    {q:"¿Cuál es el área de un triángulo con base 12 cm y altura 5 cm?",options:[["A","60 cm²"],["B","30 cm²"],["C","17 cm²"]],correct:"B",just:"A = (12 × 5) ÷ 2 = 30 cm²."},
+    {q:"El área de un círculo de radio 5 cm (π≈3.14) es aproximadamente:",options:[["A","31.4 cm²"],["B","78.5 cm²"],["C","157 cm²"]],correct:"B",just:"A = π·r² = 3.14 × 25 = 78.5 cm²."}
   ],
   16: [
-    { q: "Velocidad se define como:", options: [["A","Distancia × tiempo"],["B","Desplazamiento / tiempo"],["C","Tiempo / distancia"],["D","Masa × aceleración"]], correct: "B", just: "v = Δx/Δt; incluye dirección (es vector)." },
-    { q: "Aceleración es:", options: [["A","Cambio de masa"],["B","Cambio de velocidad por unidad de tiempo"],["C","Distancia recorrida"],["D","Inversa de velocidad"]], correct: "B", just: "a = Δv/Δt; medida en m/s²." },
-    { q: "Si un auto va a velocidad constante, su aceleración es:", options: [["A","Máxima"],["B","Cero"],["C","Negativa"],["D","Infinita"]], correct: "B", just: "Sin cambio de velocidad ⇒ a = 0." },
-    { q: "Un objeto en caída libre acelera a aproximadamente:", options: [["A","1 m/s²"],["B","9.8 m/s²"],["C","100 m/s²"],["D","0 m/s²"]], correct: "B", just: "Gravedad terrestre g ≈ 9.8 m/s² (ignorando aire)." },
-    { q: "Si recorres 100 m en 20 s, tu rapidez promedio es:", options: [["A","2 m/s"],["B","5 m/s"],["C","20 m/s"],["D","200 m/s"]], correct: "B", just: "v = 100/20 = 5 m/s." }
+    {q:"Dos triángulos con lados 2,3,4 y 4,6,8 son:",options:[["A","Congruentes"],["B","Semejantes"],["C","No relacionados"]],correct:"B",just:"Cada lado del segundo es el doble; misma forma, distinto tamaño."}
   ],
   17: [
-    { q: "La nanotecnología trabaja a escala:", options: [["A","Milímetro"],["B","Nanómetro (10⁻⁹ m)"],["C","Kilómetro"],["D","Micrómetro"]], correct: "B", just: "1 nm = 1 mil millonésima de metro; permite manipular átomos y moléculas." },
-    { q: "Inteligencia artificial se refiere a:", options: [["A","Robots humanoides solamente"],["B","Sistemas que simulan aprendizaje y razonamiento"],["C","Computadoras antiguas"],["D","Internet"]], correct: "B", just: "Algoritmos que reconocen patrones, aprenden y toman decisiones." },
-    { q: "La energía solar fotovoltaica:", options: [["A","Quema carbón"],["B","Convierte luz en electricidad"],["C","Genera petróleo"],["D","Produce CO₂"]], correct: "B", just: "Los paneles usan el efecto fotoeléctrico en silicio." },
-    { q: "Un avance reciente en exploración espacial es:", options: [["A","El telégrafo"],["B","Cohetes reutilizables"],["C","La pólvora"],["D","El globo aerostático"]], correct: "B", just: "SpaceX y otras han desarrollado cohetes que aterrizan y se reutilizan." },
-    { q: "La impresión 3D permite:", options: [["A","Solo imprimir papel"],["B","Crear objetos físicos por capas a partir de un diseño digital"],["C","Generar electricidad"],["D","Cocinar"]], correct: "B", just: "Fabricación aditiva: deposita material capa por capa siguiendo un modelo 3D." }
+    {q:"Un triángulo rectángulo tiene catetos de 6 cm y 8 cm. ¿Su hipotenusa?",options:[["A","10 cm"],["B","12 cm"],["C","14 cm"]],correct:"A",just:"c = √(36 + 64) = √100 = 10 cm."}
   ],
   18: [
-    { q: "1 gramo de carbohidratos aporta:", options: [["A","4 kcal"],["B","9 kcal"],["C","7 kcal"],["D","2 kcal"]], correct: "A", just: "Carbohidratos y proteínas: 4 kcal/g; lípidos: 9 kcal/g." },
-    { q: "El nutriente con MAYOR aporte calórico por gramo es:", options: [["A","Proteína"],["B","Carbohidrato"],["C","Lípido"],["D","Agua"]], correct: "C", just: "Los lípidos aportan 9 kcal/g — más del doble que los otros." },
-    { q: "Una caloría es:", options: [["A","Una unidad de masa"],["B","Energía para elevar 1 g de agua 1 °C"],["C","Unidad de presión"],["D","Una vitamina"]], correct: "B", just: "1 cal eleva 1 g de agua de 14.5 a 15.5 °C; 1 kcal = 1000 cal." },
-    { q: "El alcohol etílico aporta aproximadamente:", options: [["A","1 kcal/g"],["B","7 kcal/g"],["C","4 kcal/g"],["D","0 kcal/g"]], correct: "B", just: "El etanol aporta 7 kcal/g (energía vacía, sin nutrientes esenciales)." },
-    { q: "100 g de un alimento con 20 g de carbohidratos, 10 g de proteína y 5 g de grasa aportan:", options: [["A","165 kcal"],["B","100 kcal"],["C","200 kcal"],["D","250 kcal"]], correct: "A", just: "(20×4) + (10×4) + (5×9) = 80 + 40 + 45 = 165 kcal." }
+    {q:"El intervalo que representa la desigualdad −1 < x ≤ 4 es:",options:[["A","[−1, 4]"],["B","(−1, 4]"],["C","(−1, 4)"]],correct:"B",just:"El −1 se excluye (paréntesis) y el 4 se incluye (corchete)."},
+    {q:"Si f(x) sube de izquierda a derecha en un tramo, ahí la función es:",options:[["A","Decreciente"],["B","Creciente"],["C","Constante"]],correct:"B",just:"Si los valores de y aumentan al avanzar en x, es creciente."}
   ],
   19: [
-    { q: "Una sustancia pura es aquella que:", options: [["A","Es muy cara"],["B","Tiene composición química definida y constante"],["C","Está mezclada"],["D","Es siempre líquida"]], correct: "B", just: "Puede ser elemento (Fe, O₂) o compuesto (H₂O, NaCl); composición fija." },
-    { q: "Una mezcla heterogénea es:", options: [["A","Agua con sal"],["B","Ensalada o agua con aceite"],["C","Aire limpio"],["D","Acero"]], correct: "B", just: "Se distinguen sus componentes a simple vista o microscopio." },
-    { q: "El aire es un ejemplo de:", options: [["A","Elemento puro"],["B","Mezcla homogénea (gases)"],["C","Compuesto"],["D","Mezcla heterogénea"]], correct: "B", just: "N₂, O₂, CO₂... mezclados uniformemente: solución gaseosa." },
-    { q: "El agua (H₂O) es:", options: [["A","Un elemento"],["B","Un compuesto"],["C","Una mezcla"],["D","Una aleación"]], correct: "B", just: "Compuesto: H y O unidos químicamente en proporción fija 2:1." },
-    { q: "Una aleación como el bronce es:", options: [["A","Mezcla homogénea de metales"],["B","Un elemento"],["C","Un compuesto"],["D","Una emulsión"]], correct: "A", just: "Bronce = Cu + Sn; mezcla sólida con composición variable." }
+    {q:"¿Cuál es la derivada de f(x) = 4x² − 3x + 9?",options:[["A","8x − 3"],["B","8x − 3 + 9"],["C","4x − 3"]],correct:"A",just:"Derivada de 4x² = 8x; de −3x = −3; de 9 = 0."},
+    {q:"lím (x→3) de (2x² − x) =",options:[["A","12"],["B","15"],["C","18"]],correct:"B",just:"Sustitución directa: 2(9) − 3 = 15."},
+    {q:"En f(x) = x² − 8x, el punto crítico (f'(x)=0) está en:",options:[["A","x = 4"],["B","x = 8"],["C","x = 0"]],correct:"A",just:"f'(x) = 2x − 8 = 0 → x = 4."}
   ],
+
+  // ===== Cultura Digital =====
   20: [
-    { q: "Energía cinética es la asociada a:", options: [["A","La posición"],["B","El movimiento"],["C","La temperatura solamente"],["D","La carga"]], correct: "B", just: "Ec = ½·m·v²; depende de la masa y la velocidad." },
-    { q: "Energía potencial gravitatoria se calcula como:", options: [["A","m·v"],["B","m·g·h"],["C","½·m·v²"],["D","F·d"]], correct: "B", just: "Ep = m·g·h: depende de la altura sobre un nivel de referencia." },
-    { q: "Una pelota en lo alto de una colina tiene principalmente:", options: [["A","Energía cinética"],["B","Energía potencial"],["C","Sin energía"],["D","Energía química"]], correct: "B", just: "Está en reposo a cierta altura: la energía está almacenada." },
-    { q: "Cuando la pelota cae, su energía potencial se convierte en:", options: [["A","Eléctrica"],["B","Cinética"],["C","Sonora"],["D","Magnética"]], correct: "B", just: "Conservación de la energía mecánica: Ep ↓ ⇔ Ec ↑." },
-    { q: "La energía cinética de un objeto se duplica si:", options: [["A","Se duplica la masa"],["B","La velocidad se multiplica por √2"],["C","Se reduce la masa a la mitad"],["D","Se duplica la velocidad"]], correct: "B", just: "Ec ∝ v²; v×√2 ⇒ Ec×2. Duplicar v cuadruplica la energía." }
+    {q:"El rastro que dejamos al navegar y publicar en internet se llama:",options:[["A","Huella digital"],["B","Malware"],["C","Firewall"]],correct:"A",just:"Es la huella digital, parte de la identidad digital."},
+    {q:"La reputación digital se refiere a:",options:[["A","La opinión que otros se forman de ti en línea"],["B","El precio de tu dispositivo"],["C","Tu antivirus"]],correct:"A",just:"Es parte de la identidad digital."}
   ],
   21: [
-    { q: "Reacción exotérmica es aquella que:", options: [["A","Absorbe energía"],["B","Libera energía"],["C","No produce cambio"],["D","Detiene el tiempo"]], correct: "B", just: "Libera calor o luz; ΔH < 0. Ejemplo: combustión." },
-    { q: "Reacción endotérmica significa:", options: [["A","Libera calor"],["B","Absorbe calor del entorno"],["C","No requiere energía"],["D","Es siempre rápida"]], correct: "B", just: "Toma energía: ΔH > 0. Ejemplo: fotosíntesis." },
-    { q: "La fotosíntesis es una reacción:", options: [["A","Exotérmica"],["B","Endotérmica (absorbe luz solar)"],["C","Sin energía"],["D","De combustión"]], correct: "B", just: "Las plantas usan energía solar para sintetizar glucosa." },
-    { q: "La combustión de gasolina es:", options: [["A","Endotérmica"],["B","Exotérmica"],["C","Neutra"],["D","Frío"]], correct: "B", just: "Libera mucha energía como calor y luz." },
-    { q: "Ley de conservación de la energía dice que la energía:", options: [["A","Desaparece"],["B","Se transforma pero no se crea ni destruye"],["C","Aumenta sola"],["D","Solo existe en sólidos"]], correct: "B", just: "Primer principio de la termodinámica." }
+    {q:"Linux y LibreOffice son ejemplos de software:",options:[["A","Propietario"],["B","De código abierto"],["C","Shareware"]],correct:"B",just:"Permiten estudiar y modificar su código fuente."},
+    {q:"Una versión de prueba gratuita por 30 días es ejemplo de:",options:[["A","Freeware"],["B","Shareware"],["C","Software libre"]],correct:"B",just:"El shareware es gratis temporalmente y luego se paga."},
+    {q:"¿Cuál es un ejemplo de software propietario?",options:[["A","Microsoft Windows"],["B","Linux"],["C","GIMP"]],correct:"A",just:"Requiere pagar licencia y no se modifica."}
   ],
   22: [
-    { q: "Material que conduce bien la electricidad:", options: [["A","Madera"],["B","Cobre"],["C","Plástico"],["D","Vidrio"]], correct: "B", just: "El cobre tiene electrones libres que permiten el flujo de corriente." },
-    { q: "Un material aislante es:", options: [["A","Hierro"],["B","Caucho o plástico"],["C","Aluminio"],["D","Plata"]], correct: "B", just: "Los aislantes no permiten el paso de corriente (alta resistencia)." },
-    { q: "Los metales conducen porque tienen:", options: [["A","Muchos protones"],["B","Electrones libres deslocalizados"],["C","Iones positivos fijos"],["D","Solo neutrones"]], correct: "B", just: "El enlace metálico crea un \"mar de electrones\" móviles." },
-    { q: "El mejor conductor eléctrico es:", options: [["A","Oro"],["B","Plata"],["C","Cobre"],["D","Aluminio"]], correct: "B", just: "La plata tiene la mayor conductividad, pero se usa cobre por costo." },
-    { q: "Un semiconductor (como el silicio) se caracteriza por:", options: [["A","Conducir siempre igual"],["B","Conducir según condiciones (temperatura, dopaje)"],["C","No conducir nunca"],["D","Ser líquido"]], correct: "B", just: "Base de la electrónica moderna; chips, diodos, transistores." }
+    {q:"Un correo que imita a tu banco y pide tu contraseña con urgencia es:",options:[["A","Ransomware"],["B","Phishing"],["C","Freeware"]],correct:"B",just:"El phishing suplanta entidades confiables para robar datos."},
+    {q:"Un programa que cifra tus archivos y pide dinero para liberarlos es:",options:[["A","Phishing"],["B","Ransomware"],["C","Grooming"]],correct:"B",just:"\"Ransom\" significa rescate."},
+    {q:"La medida más recomendable para proteger una cuenta es:",options:[["A","Usar la misma contraseña en todo"],["B","Autenticación en dos factores"],["C","Compartir la contraseña"]],correct:"B",just:"El 2FA añade una segunda barrera de seguridad."}
   ],
   23: [
-    { q: "Un fenómeno natural eléctrico es:", options: [["A","Lluvia"],["B","Rayo"],["C","Marea"],["D","Sismo"]], correct: "B", just: "El rayo es una descarga eléctrica entre nube y tierra." },
-    { q: "Voltaje se mide en:", options: [["A","Amperios"],["B","Voltios"],["C","Watts"],["D","Ohms"]], correct: "B", just: "V es la unidad de diferencia de potencial eléctrico." },
-    { q: "Ley de Ohm establece que:", options: [["A","V = I·R"],["B","V = m·a"],["C","E = m·c²"],["D","F = G·m₁·m₂"]], correct: "A", just: "Voltaje = Intensidad × Resistencia." },
-    { q: "Una pila o batería proporciona:", options: [["A","Corriente alterna"],["B","Corriente continua"],["C","Sonido"],["D","Calor solamente"]], correct: "B", just: "DC: el flujo de electrones va en un solo sentido." },
-    { q: "El pararrayos protege porque:", options: [["A","Repele rayos"],["B","Conduce la descarga a tierra"],["C","Genera viento"],["D","Refleja luz"]], correct: "B", just: "Dirige la corriente del rayo a tierra evitando que dañe la estructura." }
+    {q:"El entorno virtual donde las personas interactúan a través de redes es:",options:[["A","Hardware"],["B","Ciberespacio"],["C","Algoritmo"]],correct:"B",just:"El ciberespacio es el espacio intangible de las redes informáticas."},
+    {q:"Las TICCAD incluyen, además de información y comunicación:",options:[["A","Conocimiento y aprendizaje"],["B","Hardware y software"],["C","Redes y cables"]],correct:"A",just:"Conocimiento y Aprendizaje Digitales son la \"CAD\"."}
   ],
   24: [
-    { q: "México es considerado país megadiverso porque:", options: [["A","Es muy grande"],["B","Concentra gran número de especies y ecosistemas"],["C","Tiene mucho desierto"],["D","Pocas montañas"]], correct: "B", just: "Está entre los 17 países con mayor biodiversidad del planeta." },
-    { q: "El organismo mexicano encargado de la biodiversidad es:", options: [["A","INEGI"],["B","CONABIO"],["C","SEP"],["D","CFE"]], correct: "B", just: "CONABIO = Comisión Nacional para el Conocimiento y Uso de la Biodiversidad." },
-    { q: "Un endemismo es:", options: [["A","Una enfermedad"],["B","Especie que solo existe en una región"],["C","Migración"],["D","Especie invasora"]], correct: "B", just: "El ajolote y la vaquita marina son endémicos de México." },
-    { q: "Una especie en peligro de extinción en México es:", options: [["A","Paloma común"],["B","Vaquita marina"],["C","Gato doméstico"],["D","Perro pastor"]], correct: "B", just: "Quedan menos de 20 vaquitas; cetáceo endémico del Alto Golfo." },
-    { q: "El maíz es importante en México por ser:", options: [["A","Introducido recientemente"],["B","Cultivo originario y base cultural y alimentaria"],["C","Importado"],["D","Una especie animal"]], correct: "B", just: "Domesticado en Mesoamérica hace ~9000 años; centro de origen y diversidad." }
+    {q:"¿Qué herramienta es la más adecuada para una videoconferencia?",options:[["A","Canva"],["B","Zoom"],["C","Kahoot"]],correct:"B",just:"Zoom (o Meet) está diseñado para reuniones por video."},
+    {q:"Para diseñar una infografía atractiva conviene usar:",options:[["A","Canva"],["B","Zoom"],["C","Drive"]],correct:"A",just:"Canva es una herramienta de diseño gráfico."}
   ],
   25: [
-    { q: "La tecnología es:", options: [["A","Solo computadoras"],["B","Aplicación práctica del conocimiento científico"],["C","Ciencia teórica"],["D","Magia"]], correct: "B", just: "Usa principios científicos para resolver problemas y crear herramientas." },
-    { q: "Un ejemplo de tecnología derivada de la física es:", options: [["A","Los antibióticos"],["B","El láser"],["C","La selección natural"],["D","El método científico"]], correct: "B", just: "El láser nació de la teoría cuántica de la radiación (Einstein, Maiman)." },
-    { q: "Internet surgió originalmente como:", options: [["A","Red comercial"],["B","Proyecto militar y académico (ARPANET)"],["C","Videojuego"],["D","Red bancaria"]], correct: "B", just: "ARPANET (1969) fue precursor del Internet moderno." },
-    { q: "Telecomunicaciones permiten:", options: [["A","Mover materia"],["B","Transmitir información a distancia"],["C","Crear materia"],["D","Generar comida"]], correct: "B", just: "Telégrafo, radio, satélites: transmiten señales electromagnéticas." },
-    { q: "La biotecnología combina biología con:", options: [["A","Magia"],["B","Ingeniería y tecnología"],["C","Solo química"],["D","Astrología"]], correct: "B", just: "Aplica organismos o sus componentes para producir bienes (insulina, vacunas)." }
+    {q:"¿Qué fórmula calcula el promedio de las celdas C1 a C10?",options:[["A","=SUMA(C1:C10)"],["B","=PROMEDIO(C1:C10)"],["C","=MAX(C1:C10)"]],correct:"B",just:"PROMEDIO obtiene la media; SUMA totaliza y MAX da el mayor."},
+    {q:"¿Qué función devuelve el valor más pequeño de un rango?",options:[["A","=MIN()"],["B","=MAX()"],["C","=SUMA()"]],correct:"A",just:"MIN da el valor mínimo."}
   ],
   26: [
-    { q: "Una adaptación es:", options: [["A","Un cambio rápido individual"],["B","Característica que mejora la supervivencia en un ambiente"],["C","Una enfermedad"],["D","Una mutación letal"]], correct: "B", just: "Surge por selección natural a lo largo de generaciones." },
-    { q: "El camuflaje es una adaptación:", options: [["A","Reproductiva"],["B","Morfológica/comportamental para evitar depredadores"],["C","Digestiva"],["D","Auditiva"]], correct: "B", just: "Permite confundirse con el entorno (camaleón, mariposas)." },
-    { q: "Migración estacional de aves es una adaptación:", options: [["A","Genética inmediata"],["B","Conductual para buscar mejores condiciones"],["C","Anatómica"],["D","Sin valor"]], correct: "B", just: "Las aves migran para encontrar alimento y clima favorable según la época." },
-    { q: "La reproducción sexual aumenta la supervivencia porque:", options: [["A","Es más rápida"],["B","Genera variabilidad genética"],["C","Requiere menos energía"],["D","Solo produce clones"]], correct: "B", just: "Recombina alelos: poblaciones más adaptables a cambios ambientales." },
-    { q: "Una característica heredada favorable se transmite a la descendencia mediante:", options: [["A","Aprendizaje"],["B","Genes"],["C","Imitación"],["D","Magia"]], correct: "B", just: "La selección natural actúa sobre rasgos heredables codificados en el ADN." }
+    {q:"En el método ADDIE, \"medir resultados y mejorar\" corresponde a:",options:[["A","Analizar"],["B","Desarrollar"],["C","Evaluar"]],correct:"C",just:"Evaluar es la última fase: medir y retroalimentar."},
+    {q:"Un asistente de voz que aprende de tus preferencias usa:",options:[["A","Inteligencia artificial"],["B","Ransomware"],["C","Shareware"]],correct:"A",just:"Imita capacidades humanas como aprender."},
+    {q:"El refrigerador inteligente conectado a internet es ejemplo de:",options:[["A","Internet de las cosas"],["B","Ciencia de datos"],["C","Ransomware"]],correct:"A",just:"IoT conecta objetos cotidianos a la red."}
   ],
   27: [
-    { q: "La fuente primaria de energía para los ecosistemas terrestres es:", options: [["A","El viento"],["B","El Sol"],["C","La Luna"],["D","El petróleo"]], correct: "B", just: "Las plantas captan energía solar y la convierten en química (fotosíntesis)." },
-    { q: "Los productores son organismos que:", options: [["A","Comen otros animales"],["B","Sintetizan su alimento (fotosíntesis/quimiosíntesis)"],["C","Descomponen materia"],["D","Parasitan"]], correct: "B", just: "Plantas, algas y algunas bacterias forman la base de la cadena." },
-    { q: "Un consumidor primario es:", options: [["A","León"],["B","Conejo (herbívoro)"],["C","Hongo"],["D","Planta"]], correct: "B", just: "Se alimenta directamente de productores." },
-    { q: "Los descomponedores (hongos, bacterias) cumplen la función de:", options: [["A","Producir oxígeno"],["B","Reciclar materia orgánica devolviendo nutrientes al suelo"],["C","Cazar presas"],["D","Crear nuevos organismos"]], correct: "B", just: "Liberan minerales al sustrato para que productores los reutilicen." },
-    { q: "En cada nivel trófico se transfiere aproximadamente:", options: [["A","100% de la energía"],["B","10% de la energía"],["C","50%"],["D","0%"]], correct: "B", just: "Regla del 10%: el resto se disipa como calor (segunda ley termodinámica)." }
+    {q:"Escribir un mensaje TODO EN MAYÚSCULAS en un foro se interpreta como:",options:[["A","Gritar (falta de netiqueta)"],["B","Buena ortografía"],["C","Cifrado seguro"]],correct:"A",just:"Va contra la netiqueta."},
+    {q:"La licencia Creative Commons que prohíbe el uso comercial es:",options:[["A","BY"],["B","NC"],["C","SA"]],correct:"B",just:"NC = No Comercial."},
+    {q:"Copiar un texto de internet sin citar al autor es:",options:[["A","Plagio"],["B","Netiqueta"],["C","Respaldo"]],correct:"A",just:"Viola los derechos de autor."}
+  ],
+  28: [
+    {q:"Una característica esencial de todo algoritmo es que sea:",options:[["A","Infinito"],["B","Ambiguo"],["C","Finito"]],correct:"C",just:"Debe terminar tras un número limitado de pasos."},
+    {q:"Un operador relacional es:",options:[["A","+"],["B",">"],["C","Y (AND)"]],correct:"B",just:"\">\" compara valores; \"+\" es aritmético y \"Y\" es lógico."}
+  ],
+  29: [
+    {q:"En un diagrama de flujo, el rombo representa:",options:[["A","Inicio o fin"],["B","Una decisión"],["C","Un proceso"]],correct:"B",just:"El rombo plantea una condición con dos caminos (verdadero/falso)."},
+    {q:"El paralelogramo en un diagrama de flujo indica:",options:[["A","Entrada/salida de datos"],["B","Decisión"],["C","Inicio"]],correct:"A",just:"Representa leer o mostrar datos."}
+  ],
+  30: [
+    {q:"La estructura \"Si… entonces… si no…\" es:",options:[["A","Selectiva"],["B","Repetitiva"],["C","Secuencial"]],correct:"A",just:"Decide entre caminos según una condición."},
+    {q:"Internet es un ejemplo de red tipo:",options:[["A","LAN"],["B","WAN"],["C","Local"]],correct:"B",just:"Cubre grandes distancias (red de área amplia)."}
+  ],
+
+  // ===== Conciencia Histórica =====
+  31: [
+    {q:"Los olmecas son considerados la:",options:[["A","Cultura madre de Mesoamérica"],["B","Última civilización colonial"],["C","Cultura de Aridoamérica"]],correct:"A",just:"Influyeron en las culturas mesoamericanas posteriores."},
+    {q:"Los pueblos nómadas del norte árido se conocían como:",options:[["A","Chichimecas"],["B","Mayas"],["C","Olmecas"]],correct:"A",just:"Habitaban Aridoamérica."}
+  ],
+  32: [
+    {q:"¿Qué pueblo indígena se alió principalmente con Cortés contra los mexicas?",options:[["A","Los mayas"],["B","Los tlaxcaltecas"],["C","Los purépechas"]],correct:"B",just:"Los tlaxcaltecas, enemigos de los mexicas, fueron aliados clave."},
+    {q:"La viruela influyó en la conquista porque:",options:[["A","Fortaleció a los mexicas"],["B","Diezmó a la población indígena sin defensas"],["C","Afectó solo a los españoles"]],correct:"B",just:"Las epidemias redujeron drásticamente a los nativos."}
+  ],
+  33: [
+    {q:"En la sociedad novohispana, los hijos de españoles nacidos en América eran:",options:[["A","Peninsulares"],["B","Criollos"],["C","Castas"]],correct:"B",just:"Los criollos tenían riqueza pero poder político limitado."},
+    {q:"La economía novohispana se basó principalmente en:",options:[["A","La minería de plata"],["B","El turismo"],["C","La industria automotriz"]],correct:"A",just:"La plata fue el motor económico colonial."}
+  ],
+  34: [
+    {q:"El Día de Muertos fue reconocido por la Unesco como:",options:[["A","Patrimonio Cultural Inmaterial"],["B","Maravilla natural"],["C","Deporte nacional"]],correct:"A",just:"Declarado en 2008."},
+    {q:"El sincretismo religioso se ejemplifica con:",options:[["A","La Virgen de Guadalupe"],["B","El TLCAN"],["C","El Escuadrón 201"]],correct:"A",just:"Fusión de creencias indígenas y católicas."}
+  ],
+  35: [
+    {q:"El documento de Morelos que proponía la independencia y abolir la esclavitud fue:",options:[["A","El Plan de Ayala"],["B","Los Sentimientos de la Nación"],["C","El Plan de Iguala"]],correct:"B",just:"Los Sentimientos de la Nación (1813) sintetizaron su ideario."},
+    {q:"El detonante inmediato de la Independencia fue:",options:[["A","La invasión napoleónica a España"],["B","El TLCAN"],["C","La Batalla de Puebla"]],correct:"A",just:"El vacío de poder de 1808 abrió la puerta al movimiento."}
+  ],
+  36: [
+    {q:"Las Leyes de Reforma fueron impulsadas por:",options:[["A","Benito Juárez"],["B","Iturbide"],["C","Maximiliano"]],correct:"A",just:"Juárez encabezó el liberalismo reformista."},
+    {q:"La separación Iglesia-Estado en México se logró con:",options:[["A","Las Leyes de Reforma"],["B","El Plan de Iguala"],["C","El TLCAN"]],correct:"A",just:"Impulsadas por Juárez (1859-60)."}
+  ],
+  37: [
+    {q:"Con el Tratado de Guadalupe Hidalgo, México:",options:[["A","Ganó territorio"],["B","Perdió más de la mitad de su territorio"],["C","Se unió a Francia"]],correct:"B",just:"Cedió Alta California, Nuevo México y más."},
+    {q:"La Batalla de Puebla (5 de mayo) se libró contra el ejército:",options:[["A","Francés"],["B","Estadounidense"],["C","Español"]],correct:"A",just:"Fue una victoria mexicana contra Francia en 1862."}
+  ],
+  38: [
+    {q:"Las huelgas de Cananea y Río Blanco ocurrieron durante el:",options:[["A","Porfiriato"],["B","Virreinato"],["C","Imperio"]],correct:"A",just:"Fueron reprimidas por el régimen de Díaz."},
+    {q:"El \"orden y progreso\" fue el lema del:",options:[["A","Porfiriato"],["B","Virreinato"],["C","Maderismo"]],correct:"A",just:"Resumía la política de Díaz."}
+  ],
+  39: [
+    {q:"El lema \"Tierra y Libertad\" y el Plan de Ayala corresponden a:",options:[["A","Venustiano Carranza"],["B","Emiliano Zapata"],["C","Porfirio Díaz"]],correct:"B",just:"Zapata exigía el reparto agrario para los campesinos."},
+    {q:"La Constitución de 1917 destaca por incluir:",options:[["A","Derechos sociales (educación, tierra, trabajo)"],["B","La monarquía"],["C","La esclavitud"]],correct:"A",just:"Fue pionera en derechos sociales."}
+  ],
+  40: [
+    {q:"La expropiación petrolera de 1938 fue realizada por:",options:[["A","Lázaro Cárdenas"],["B","Porfirio Díaz"],["C","Vicente Fox"]],correct:"A",just:"Cárdenas nacionalizó el petróleo y creó Pemex."},
+    {q:"El partido que gobernó más de 70 años fue el:",options:[["A","PRI"],["B","PAN"],["C","PRD"]],correct:"A",just:"Partido hegemónico del siglo XX."}
+  ],
+  41: [
+    {q:"México recibió exiliados durante la:",options:[["A","Guerra Civil Española"],["B","Guerra de Castas"],["C","Conquista"]],correct:"A",just:"Acogió a republicanos españoles (1939)."},
+    {q:"El Escuadrón 201 combatió en la:",options:[["A","Segunda Guerra Mundial"],["B","Guerra de Castas"],["C","Revolución"]],correct:"A",just:"México participó con los Aliados."}
+  ],
+  42: [
+    {q:"El modelo neoliberal en México implicó:",options:[["A","Privatizaciones y apertura comercial"],["B","Más empresas estatales"],["C","Cierre de fronteras"]],correct:"A",just:"Reducción del Estado y libre mercado."},
+    {q:"La crisis de deuda que aceleró el neoliberalismo fue la de:",options:[["A","1982"],["B","1521"],["C","1810"]],correct:"A",just:"La crisis de 1982."}
+  ],
+  43: [
+    {q:"La alternancia política del año 2000 significó que:",options:[["A","Se prohibieron los partidos"],["B","El PRI perdió la presidencia tras décadas"],["C","México dejó de ser república"]],correct:"B",just:"Fue la primera derrota presidencial del PRI en 71 años."},
+    {q:"El INE (antes IFE) se encarga de:",options:[["A","Organizar elecciones"],["B","Cobrar impuestos"],["C","Educar"]],correct:"A",just:"Da certeza a los procesos electorales."}
+  ],
+  44: [
+    {q:"Una carta de un testigo de la Independencia es una fuente:",options:[["A","Primaria"],["B","Secundaria"],["C","Terciaria"]],correct:"A",just:"Proviene directamente de la época."},
+    {q:"Que un hecho tenga varias causas se llama:",options:[["A","Multicausalidad"],["B","Permanencia"],["C","Sincretismo"]],correct:"A",just:"Causas políticas, económicas y sociales se combinan."}
+  ],
+
+  // ===== Humanidades =====
+  45: [
+    {q:"La filosofía se distingue del mito porque usa:",options:[["A","La razón y la argumentación"],["B","Relatos sobrenaturales"],["C","Experimentos de laboratorio"]],correct:"A",just:"Busca explicaciones racionales (el paso del mito al logos)."}
+  ],
+  46: [
+    {q:"Una opinión superficial basada en la apariencia se denomina, según Platón:",options:[["A","Episteme"],["B","Doxa"],["C","Logos"]],correct:"B",just:"La doxa es opinión; la episteme es conocimiento justificado."},
+    {q:"La rama de la filosofía que estudia el conocimiento es la:",options:[["A","Epistemología"],["B","Estética"],["C","Ética"]],correct:"A",just:"Estudia el origen y validez del conocimiento."}
+  ],
+  47: [
+    {q:"La frase \"la existencia precede a la esencia\" pertenece al:",options:[["A","Existencialismo"],["B","Mito"],["C","Empirismo"]],correct:"A",just:"Es la tesis central del existencialismo."},
+    {q:"Pedir evidencias y examinar premisas es parte del:",options:[["A","Pensamiento crítico"],["B","Mito"],["C","Prejuicio"]],correct:"A",just:"Evaluar con argumentos, no aceptar sin razones."}
+  ],
+  48: [
+    {q:"\"¡Qué hermoso día!\" cumple la función del lenguaje:",options:[["A","Emotiva"],["B","Referencial"],["C","Fática"]],correct:"A",just:"Expresa un sentimiento del emisor."},
+    {q:"\"¿Bueno? ¿Me escuchas?\" corresponde a la función:",options:[["A","Fática"],["B","Poética"],["C","Apelativa"]],correct:"A",just:"Verifica que el canal funcione."}
+  ],
+  49: [
+    {q:"\"Todos los metales se dilatan; el hierro es metal; luego se dilata\" es un argumento:",options:[["A","Inductivo"],["B","Deductivo"],["C","Analógico"]],correct:"B",just:"Va de lo general a lo particular con conclusión necesaria."},
+    {q:"Observar muchos cisnes blancos y concluir \"todos son blancos\" es:",options:[["A","Deductivo"],["B","Inductivo"],["C","Analógico"]],correct:"B",just:"De casos particulares a una generalización probable."}
+  ],
+  50: [
+    {q:"Atacar a quien argumenta en vez de su idea es la falacia:",options:[["A","Ad hominem"],["B","Ad populum"],["C","Falsa causa"]],correct:"A",just:"Ataca a la persona, no al argumento."},
+    {q:"\"Todos lo hacen, así que está bien\" es la falacia:",options:[["A","Ad populum"],["B","Ad baculum"],["C","Ad hominem"]],correct:"A",just:"Apela a la mayoría."}
+  ],
+  51: [
+    {q:"\"Lo correcto es lo que produce mayor felicidad para el mayor número\" es el:",options:[["A","Hedonismo"],["B","Utilitarismo"],["C","Estoicismo"]],correct:"B",just:"El utilitarismo evalúa por las consecuencias para la mayoría."},
+    {q:"El autocontrol y la serenidad ante lo inevitable caracterizan al:",options:[["A","Estoicismo"],["B","Hedonismo"],["C","Existencialismo"]],correct:"A",just:"Los estoicos valoraban la virtud y la calma."}
+  ],
+  52: [
+    {q:"Una norma cuyo incumplimiento conlleva una sanción legal es:",options:[["A","Moral"],["B","Social"],["C","Jurídica"]],correct:"C",just:"Las normas jurídicas las impone el Estado."},
+    {q:"Sentir remordimiento al incumplir una norma indica que es:",options:[["A","Moral"],["B","Jurídica"],["C","Social"]],correct:"A",just:"Las normas morales apelan a la conciencia."}
+  ],
+  53: [
+    {q:"Decidir según las propias normas, con libertad y razón, es:",options:[["A","Heteronomía"],["B","Autonomía"],["C","Anomia"]],correct:"B",just:"Autonomía = darse a sí mismo la ley."}
+  ],
+  54: [
+    {q:"El principio bioético de \"primero, no dañar\" es:",options:[["A","Justicia"],["B","No maleficencia"],["C","Autonomía"]],correct:"B",just:"No maleficencia: evitar causar daño."},
+    {q:"Repartir recursos médicos de forma equitativa es el principio de:",options:[["A","Justicia"],["B","Autonomía"],["C","Beneficencia"]],correct:"A",just:"Justicia distributiva."}
+  ],
+  55: [
+    {q:"El sistema de dominación masculina se denomina:",options:[["A","Patriarcado"],["B","Alteridad"],["C","Hermenéutica"]],correct:"A",just:"Patriarcado."},
+    {q:"El reconocimiento y respeto del \"otro\" como diferente es:",options:[["A","Alteridad"],["B","Doxa"],["C","Mito"]],correct:"A",just:"Alteridad, base de la convivencia y la tolerancia."}
+  ],
+  56: [
+    {q:"La categoría estética de lo grandioso que sobrecoge es lo:",options:[["A","Cómico"],["B","Sublime"],["C","Grotesco"]],correct:"B",just:"Lo sublime supera nuestra medida y nos sobrecoge."},
+    {q:"El sufrimiento y la fatalidad inevitable en el arte es lo:",options:[["A","Trágico"],["B","Cómico"],["C","Bello"]],correct:"A",just:"Lo trágico."}
+  ],
+  57: [
+    {q:"La teoría de la interpretación de textos es la:",options:[["A","Hermenéutica"],["B","Lógica"],["C","Estética"]],correct:"A",just:"Busca comprender el sentido de una obra en su contexto."}
+  ],
+  58: [
+    {q:"La mayéutica y \"solo sé que no sé nada\" son de:",options:[["A","Sócrates"],["B","Kant"],["C","Sartre"]],correct:"A",just:"Sócrates."},
+    {q:"El \"justo medio\" entre dos extremos es propio de la ética de:",options:[["A","Aristóteles"],["B","Epicuro"],["C","Sartre"]],correct:"A",just:"Ética de la virtud aristotélica."}
+  ],
+
+  // ===== Ciencias Naturales =====
+  59: [
+    {q:"El enlace de la sal común (NaCl), entre un metal y un no metal, es:",options:[["A","Covalente"],["B","Iónico"],["C","Metálico"]],correct:"B",just:"El sodio cede un electrón al cloro; se atraen por sus cargas."},
+    {q:"El enlace del cobre metálico es:",options:[["A","Iónico"],["B","Metálico"],["C","Covalente"]],correct:"B",just:"Los metales comparten electrones libres."}
+  ],
+  60: [
+    {q:"Según la ley de conservación de la materia, la masa de los productos es:",options:[["A","Mayor que la de los reactivos"],["B","Igual a la de los reactivos"],["C","Menor que la de los reactivos"]],correct:"B",just:"La materia solo se transforma; la masa total se conserva."},
+    {q:"El paso de sólido a gas sin pasar por líquido es:",options:[["A","Sublimación"],["B","Fusión"],["C","Condensación"]],correct:"A",just:"Sublimación (ej. hielo seco)."}
+  ],
+  61: [
+    {q:"25 °C equivalen a cuántos kelvin:",options:[["A","248 K"],["B","298 K"],["C","25 K"]],correct:"B",just:"K = 25 + 273 = 298."},
+    {q:"Cargas eléctricas del mismo signo:",options:[["A","Se atraen"],["B","Se repelen"],["C","No interactúan"]],correct:"B",just:"Cargas iguales se repelen (ley de Coulomb)."}
+  ],
+  62: [
+    {q:"La energía que posee un objeto por estar en movimiento es la energía:",options:[["A","Potencial"],["B","Cinética"],["C","Nuclear"]],correct:"B",just:"La energía cinética depende de la masa y la velocidad."},
+    {q:"La energía del viento es la energía:",options:[["A","Eólica"],["B","Nuclear"],["C","Química"]],correct:"A",just:"Eólica (renovable)."}
+  ],
+  63: [
+    {q:"El agua tiene un calor específico alto, por eso:",options:[["A","Tarda en calentarse y enfriarse"],["B","Hierve a 50 °C"],["C","No conduce calor"]],correct:"A",just:"Necesita mucha energía para cambiar de temperatura."}
+  ],
+  64: [
+    {q:"\"La energía no se crea ni se destruye, solo se transforma\" es la:",options:[["A","Primera ley de la termodinámica"],["B","Ley de Coulomb"],["C","Segunda ley"]],correct:"A",just:"Es el principio de conservación de la energía."},
+    {q:"La entropía del universo, según la 2ª ley, tiende a:",options:[["A","Aumentar"],["B","Disminuir"],["C","Mantenerse"]],correct:"A",just:"El desorden del universo siempre aumenta."}
+  ],
+  65: [
+    {q:"En la fotosíntesis, las plantas liberan:",options:[["A","Dióxido de carbono"],["B","Oxígeno"],["C","Nitrógeno"]],correct:"B",just:"Producen glucosa y liberan oxígeno usando CO₂, agua y luz."},
+    {q:"¿Qué porcentaje de energía pasa aproximadamente al siguiente nivel trófico?",options:[["A","10%"],["B","50%"],["C","90%"]],correct:"A",just:"Solo cerca del 10% se transfiere; el resto se pierde como calor."}
+  ],
+  66: [
+    {q:"El bioma de frío extremo y suelo congelado es la:",options:[["A","Selva"],["B","Tundra"],["C","Sabana"]],correct:"B",just:"Tundra."},
+    {q:"La polinización y el agua limpia son ejemplos de:",options:[["A","Servicios ambientales"],["B","Reacciones nucleares"],["C","Enlaces químicos"]],correct:"A",just:"Beneficios que la naturaleza brinda a la humanidad."}
+  ],
+  67: [
+    {q:"AB → A + B es una reacción de:",options:[["A","Síntesis"],["B","Descomposición"],["C","Combustión"]],correct:"B",just:"Un compuesto se separa en sustancias más simples."},
+    {q:"La masa molar del agua (H₂O) es:",options:[["A","18 g/mol"],["B","16 g/mol"],["C","2 g/mol"]],correct:"A",just:"2(1) + 16 = 18 g/mol."}
+  ],
+  68: [
+    {q:"El proceso por el que el Sol produce energía uniendo núcleos ligeros es:",options:[["A","Fisión"],["B","Fusión"],["C","Combustión"]],correct:"B",just:"En la fusión nuclear se unen núcleos (hidrógeno → helio)."},
+    {q:"La división de un núcleo pesado en otros más ligeros es:",options:[["A","Fusión"],["B","Fisión"],["C","Oxidación"]],correct:"B",just:"Fisión nuclear (centrales nucleares)."}
+  ],
+  69: [
+    {q:"Dos objetos de distinta masa caen en el vacío. ¿Cuál llega primero?",options:[["A","El más pesado"],["B","El más ligero"],["C","Llegan al mismo tiempo"]],correct:"C",just:"En caída libre la aceleración es igual para todos (g)."}
+  ],
+  70: [
+    {q:"La cantidad de movimiento se calcula como:",options:[["A","p = m·v"],["B","p = m·g·h"],["C","p = ½mv²"]],correct:"A",just:"Momento lineal = masa × velocidad."},
+    {q:"En un choque elástico:",options:[["A","Los objetos quedan unidos"],["B","Se conserva la energía cinética"],["C","Se pierde toda la energía"]],correct:"B",just:"Los objetos rebotan conservando energía cinética."}
+  ],
+  71: [
+    {q:"La luz visible forma parte del espectro:",options:[["A","Sonoro"],["B","Electromagnético"],["C","Mecánico"]],correct:"B",just:"Es una porción del espectro electromagnético."}
+  ],
+  72: [
+    {q:"El organelo encargado de producir energía en la célula es:",options:[["A","El núcleo"],["B","La mitocondria"],["C","El ribosoma"]],correct:"B",just:"La mitocondria realiza la respiración celular."},
+    {q:"La estructura presente en la célula vegetal pero NO en la animal es:",options:[["A","El núcleo"],["B","La mitocondria"],["C","El cloroplasto"]],correct:"C",just:"El cloroplasto y la pared celular son exclusivos de las plantas."}
+  ],
+  73: [
+    {q:"La glucólisis ocurre en:",options:[["A","El citoplasma"],["B","El núcleo"],["C","La pared celular"]],correct:"A",just:"Divide la glucosa en 2 piruvatos en el citoplasma."},
+    {q:"El orden correcto de menor a mayor complejidad es:",options:[["A","Célula, tejido, órgano"],["B","Órgano, célula, tejido"],["C","Tejido, célula, órgano"]],correct:"A",just:"Célula → tejido → órgano."}
+  ],
+  74: [
+    {q:"Al cruzar Aa × Aa, ¿qué porcentaje muestra el rasgo recesivo (aa)?",options:[["A","25%"],["B","50%"],["C","75%"]],correct:"A",just:"Solo 1 de las 4 combinaciones es aa → 25%."},
+    {q:"El ser humano tiene cuántos cromosomas:",options:[["A","23"],["B","46"],["C","48"]],correct:"B",just:"46 (23 pares)."}
+  ],
+  75: [
+    {q:"La supervivencia de los mejor adaptados es la base de la teoría de:",options:[["A","Lamarck"],["B","Darwin (selección natural)"],["C","Mendel"]],correct:"B",just:"Darwin propuso la selección natural."},
+    {q:"Alas de aves e insectos (especies sin parentesco) ilustran evolución:",options:[["A","Convergente"],["B","Divergente"],["C","Nula"]],correct:"A",just:"Rasgos similares por ambientes parecidos."}
+  ],
+  76: [
+    {q:"La respuesta tentativa y comprobable en una investigación es la:",options:[["A","Hipótesis"],["B","Conclusión"],["C","Observación"]],correct:"A",just:"La hipótesis se pone a prueba."},
+    {q:"El grupo sin tratamiento que sirve de comparación es el:",options:[["A","Grupo control"],["B","Grupo experimental"],["C","Grupo aleatorio"]],correct:"A",just:"Grupo control."}
+  ],
+
+  // ===== Lengua y Comunicación =====
+  77: [
+    {q:"El conector \"sin embargo\" indica una relación de:",options:[["A","Causa"],["B","Contraste"],["C","Adición"]],correct:"B",just:"Introduce una idea opuesta o contraria."},
+    {q:"\"Por lo tanto\" expresa una relación de:",options:[["A","Causa-efecto"],["B","Contraste"],["C","Adición"]],correct:"A",just:"Introduce una consecuencia."}
+  ],
+  78: [
+    {q:"El nivel de comprensión que deduce lo no explícito es el:",options:[["A","Inferencial"],["B","Literal"],["C","Ortográfico"]],correct:"A",just:"Infiere a partir del texto."},
+    {q:"El resumen se diferencia de la síntesis porque:",options:[["A","El resumen condensa un texto; la síntesis integra varios"],["B","Son idénticos"],["C","El resumen es más largo"]],correct:"A",just:"La síntesis combina varias fuentes."}
+  ],
+  79: [
+    {q:"El momento de mayor tensión en la trama se llama:",options:[["A","Desenlace"],["B","Nudo o clímax"],["C","Inicio"]],correct:"B",just:"El nudo o clímax es el punto culminante del conflicto."},
+    {q:"La poesía pertenece al género:",options:[["A","Lírico"],["B","Narrativo"],["C","Dramático"]],correct:"A",just:"El género lírico expresa sentimientos."}
+  ],
+  80: [
+    {q:"Un narrador que conoce los pensamientos de todos los personajes es:",options:[["A","Protagonista"],["B","Omnisciente"],["C","Testigo"]],correct:"B",just:"El omnisciente lo sabe todo."},
+    {q:"Un relato con saltos al pasado usa tiempo:",options:[["A","Retrospectivo"],["B","Lineal"],["C","Circular"]],correct:"A",just:"Flashback o analepsis."}
+  ],
+  81: [
+    {q:"Una entrevista original es una fuente:",options:[["A","Primaria"],["B","Secundaria"],["C","Terciaria"]],correct:"A",just:"Aporta información de primera mano."},
+    {q:"Una enciclopedia es una fuente:",options:[["A","Terciaria"],["B","Primaria"],["C","Secundaria"]],correct:"A",just:"Recopila y organiza información."}
+  ],
+  82: [
+    {q:"La palabra \"médico\" es:",options:[["A","Aguda"],["B","Grave"],["C","Esdrújula"]],correct:"C",just:"Acento en la antepenúltima; las esdrújulas siempre llevan tilde."},
+    {q:"\"Café\" lleva tilde porque es aguda terminada en:",options:[["A","Vocal"],["B","Consonante r"],["C","z"]],correct:"A",just:"Agudas con tilde si terminan en n, s o vocal."}
+  ],
+  83: [
+    {q:"El núcleo del predicado es un:",options:[["A","Verbo"],["B","Sustantivo"],["C","Adjetivo"]],correct:"A",just:"El verbo es el núcleo del predicado."},
+    {q:"Que las ideas tengan orden lógico y sentido es:",options:[["A","Coherencia"],["B","Acentuación"],["C","Trama"]],correct:"A",just:"Coherencia textual."}
+  ],
+  84: [
+    {q:"La confrontación organizada de dos posturas opuestas es un:",options:[["A","Debate"],["B","Monólogo"],["C","Resumen"]],correct:"A",just:"El debate enfrenta posturas con reglas y moderador."},
+    {q:"Una mesa redonda se caracteriza porque:",options:[["A","Varios expertos exponen distintas perspectivas"],["B","Una sola persona habla"],["C","No hay público"]],correct:"A",just:"Reúne varias perspectivas de expertos."}
+  ],
+  85: [
+    {q:"Choose the correct sentence (present continuous):",options:[["A","She is reading a book now."],["B","She read a book now."],["C","She reads now a book."]],correct:"A",just:"\"now\" indica acción en progreso → is + reading (-ing)."},
+    {q:"\"I ___ to school every day.\" (present simple)",options:[["A","go"],["B","going"],["C","went"]],correct:"A",just:"Rutina → present simple: go."}
+  ],
+  86: [
+    {q:"\"They ___ playing soccer when it rained.\" (past continuous)",options:[["A","were"],["B","was"],["C","are"]],correct:"A",just:"Plural → were + playing."},
+    {q:"\"We ___ to the cinema last night.\" (past simple)",options:[["A","went"],["B","go"],["C","going"]],correct:"A",just:"\"last night\" → pasado: went."}
+  ],
+  87: [
+    {q:"The past perfect: \"She ___ already left when I arrived.\"",options:[["A","has"],["B","had"],["C","was"]],correct:"B",just:"Past perfect = had + participio (had left)."},
+    {q:"Present perfect: \"She ___ finished her homework.\"",options:[["A","has"],["B","have"],["C","had"]],correct:"A",just:"3.ª persona singular → has + participio."}
+  ],
+  88: [
+    {q:"Comparative of \"big\":",options:[["A","bigger"],["B","more big"],["C","biggest"]],correct:"A",just:"Adjetivo corto → bigger."},
+    {q:"\"___ is your teacher?\" (asks for a person)",options:[["A","Who"],["B","Where"],["C","When"]],correct:"A",just:"Who pregunta por persona."},
+    {q:"\"If I had time, I ___ travel.\" (2nd conditional)",options:[["A","would"],["B","will"],["C","am"]],correct:"A",just:"2.º condicional: would + verbo."}
+  ],
+
+  // ===== Ciencias Sociales =====
+  89: [
+    {q:"La maquinaria y el dinero invertido son el factor:",options:[["A","Capital"],["B","Tierra"],["C","Trabajo"]],correct:"A",just:"El capital incluye maquinaria, herramientas y dinero invertido."},
+    {q:"Los recursos naturales como factor de producción son la:",options:[["A","Tierra"],["B","Capital"],["C","Tecnología"]],correct:"A",just:"La tierra abarca suelo, agua y minerales."}
+  ],
+  90: [
+    {q:"La agricultura y la pesca pertenecen al sector económico:",options:[["A","Primario"],["B","Secundario"],["C","Terciario"]],correct:"A",just:"El sector primario extrae recursos naturales."},
+    {q:"El turismo y el comercio son del sector:",options:[["A","Terciario"],["B","Primario"],["C","Secundario"]],correct:"A",just:"Sector de servicios."}
+  ],
+  91: [
+    {q:"Un empleo sin seguro social ni prestaciones de ley es:",options:[["A","Formal"],["B","Informal"],["C","Público"]],correct:"B",just:"El empleo informal no está registrado ni protegido."},
+    {q:"El modelo en que el Estado garantiza salud y educación es el:",options:[["A","Estado de bienestar"],["B","Neoliberalismo"],["C","Feudalismo"]],correct:"A",just:"Estado de bienestar."}
+  ],
+  92: [
+    {q:"El aumento general y sostenido de los precios es la:",options:[["A","Inflación"],["B","Oferta"],["C","Demanda"]],correct:"A",just:"Reduce el poder adquisitivo."},
+    {q:"El valor de todo lo producido en un país en un año es el:",options:[["A","PIB"],["B","IVA"],["C","Salario"]],correct:"A",just:"Producto Interno Bruto."}
+  ],
+  93: [
+    {q:"\"El hombre es lobo del hombre\" y un Estado fuerte es idea de:",options:[["A","Rousseau"],["B","Hobbes"],["C","Locke"]],correct:"B",just:"Hobbes veía al ser humano como egoísta y conflictivo."},
+    {q:"El \"contrato social\" y la bondad natural del ser humano son ideas de:",options:[["A","Rousseau"],["B","Hobbes"],["C","Marx"]],correct:"A",just:"Rousseau."}
+  ],
+  94: [
+    {q:"En México, la ciudadanía se obtiene a los:",options:[["A","15 años"],["B","18 años"],["C","21 años"]],correct:"B",just:"Según el Art. 34 constitucional, a los 18 años."},
+    {q:"El poder que elabora las leyes es el:",options:[["A","Legislativo"],["B","Ejecutivo"],["C","Judicial"]],correct:"A",just:"El Congreso (Legislativo) hace las leyes."}
+  ],
+  95: [
+    {q:"La institución que organiza las elecciones en México es:",options:[["A","El INE"],["B","La SEP"],["C","La OMS"]],correct:"A",just:"Instituto Nacional Electoral."},
+    {q:"La Unesco se ocupa de:",options:[["A","Educación, ciencia y cultura"],["B","Alimentación"],["C","Comercio de armas"]],correct:"A",just:"Educación y cultura."}
+  ],
+  96: [
+    {q:"El grupo social primario y básico es:",options:[["A","La familia"],["B","El Estado"],["C","La ONU"]],correct:"A",just:"La familia."},
+    {q:"La sociología es la ciencia que estudia:",options:[["A","Las relaciones y estructuras sociales"],["B","Los astros"],["C","Las reacciones químicas"]],correct:"A",just:"La sociedad y sus grupos."}
+  ],
+  97: [
+    {q:"Una idea generalizada y simplificada sobre un grupo es un:",options:[["A","Estereotipo"],["B","Indicador"],["C","Factor"]],correct:"A",just:"El estereotipo simplifica y generaliza."},
+    {q:"El trato desigual e injusto hacia un grupo es:",options:[["A","Discriminación"],["B","Indicador"],["C","Capital"]],correct:"A",just:"Discriminación."}
+  ],
+  98: [
+    {q:"El levantamiento del EZLN en 1994 reivindicó principalmente:",options:[["A","Los derechos de los pueblos indígenas"],["B","La privatización"],["C","La monarquía"]],correct:"A",just:"Demandó derechos y dignidad para los indígenas."},
+    {q:"El organismo que mide la pobreza en México es el:",options:[["A","Coneval"],["B","INE"],["C","Semarnat"]],correct:"A",just:"Consejo Nacional de Evaluación."}
   ]
 };
 
-// PDFs por número de tema
-window.topicPDFs = {
-  1: "assets/pdfs/01_estructura_funciones_celula.pdf",
-  2: "assets/pdfs/02_evolucion_darwin.pdf",
-  3: "assets/pdfs/03_herencia_seres_vivos.pdf",
-  4: "assets/pdfs/04_biomoleculas.pdf",
-  5: "assets/pdfs/05_modelos_atomicos.pdf",
-  6: "assets/pdfs/06_enlaces_quimicos.pdf",
-  7: "assets/pdfs/07_estados_agregacion_materia.pdf",
-  8: "assets/pdfs/08_equilibrio_friccion_flotacion.pdf",
-  9: "assets/pdfs/09_electricidad_temperatura_biologia.pdf",
-  10: "assets/pdfs/10_ciencia_tecnologia_salud.pdf",
-  11: "assets/pdfs/11_cambios_reacciones_quimicas.pdf",
-  12: "assets/pdfs/12_separacion_mezclas.pdf",
-  13: "assets/pdfs/13_impacto_salud_ambiente.pdf",
-  14: "assets/pdfs/14_manipulacion_genetica.pdf",
-  15: "assets/pdfs/15_sistema_solar_gravitacion.pdf",
-  16: "assets/pdfs/16_velocidad_aceleracion.pdf",
-  17: "assets/pdfs/17_avances_tecnologicos.pdf",
-  18: "assets/pdfs/18_aporte_calorico_alimentos.pdf",
-  19: "assets/pdfs/19_composicion_quimica_sustancias.pdf",
-  20: "assets/pdfs/20_energia_potencial_cinetica.pdf",
-  21: "assets/pdfs/21_intercambio_energia_reacciones.pdf",
-  22: "assets/pdfs/22_sustancias_conductoras.pdf",
-  23: "assets/pdfs/23_manifestaciones_electricidad.pdf",
-  24: "assets/pdfs/24_biodiversidad_mexico.pdf",
-  25: "assets/pdfs/25_tecnologia_conocimiento_cientifico.pdf",
-  26: "assets/pdfs/26_adaptacion_evolucion.pdf",
-  27: "assets/pdfs/27_transformacion_energia_cadena_alimentaria.pdf"
-};
+// Las guías de estudio se ofrecen completas a nivel de área (window.modulesData[area].guide).
+window.topicPDFs = {};

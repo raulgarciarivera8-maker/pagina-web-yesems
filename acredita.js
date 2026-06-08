@@ -5,25 +5,32 @@
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  const AREAS = [
-    { key: 'cientifico', label: 'Pensamiento Científico',  num: '01', color: '#16a34a' },
-    { key: 'lectora',    label: 'Comprensión Lectora',     num: '02', color: '#2563eb' },
-    { key: 'redaccion',  label: 'Redacción Indirecta',     num: '03', color: '#7c3aed' },
-    { key: 'matematico', label: 'Pensamiento Matemático',  num: '04', color: '#ea580c' },
-    { key: 'ingles',     label: 'Inglés como L. Extranjera', num:'05', color: '#0891b2' }
+  let AREAS = (window.YESEMS_AREAS_DEFAULT && window.YESEMS_AREAS_DEFAULT.slice()) || [
+    { key: 'matematico',  label: 'Pensamiento Matemático', num: '01', color: '#ea580c' },
+    { key: 'digital',     label: 'Cultura Digital',        num: '02', color: '#0891b2' },
+    { key: 'historica',   label: 'Conciencia Histórica',   num: '03', color: '#b45309' },
+    { key: 'humanidades', label: 'Humanidades',            num: '04', color: '#7c3aed' },
+    { key: 'naturales',   label: 'Ciencias Naturales',     num: '05', color: '#16a34a' },
+    { key: 'lengua',      label: 'Lengua y Comunicación',  num: '06', color: '#2563eb' },
+    { key: 'sociales',    label: 'Ciencias Sociales',      num: '07', color: '#db2777' }
   ];
 
+  // Ícono genérico para áreas nuevas creadas desde el panel admin.
+  const GENERIC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+
   const AREA_ICONS = {
-    cientifico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 2v8L4 22h16L14 10V2"/></svg>',
-    lectora:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
-    redaccion:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13L13 8"/><path d="M2 2l7 7L2 16z"/></svg>',
-    matematico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v4l-6 4 6 4v4H4v-4l6-4-6-4z"/></svg>',
-    ingles:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 4 7.5 4 10s-1 7-4 10c-3-3-4-7-4-10s1-7 4-10z"/></svg>'
+    matematico:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v4l-6 4 6 4v4H4v-4l6-4-6-4z"/></svg>',
+    digital:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
+    historica:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    humanidades: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    naturales:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 20A7 7 0 0 1 9.8 6.1C16 5 18 9 18 9s-2 11-7 11z"/><path d="M11 20c0-5 2-9 6-11"/></svg>',
+    lengua:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    sociales:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>'
   };
 
   // ---------- subscription state (prototype: stored locally) ----------
   const SUB_KEY = 'yesems_acredita_sub';
-  const PLAN_LABELS = { esencial: 'Esencial', plus: 'Plus', premium: 'Premium' };
+  const PLAN_LABELS = { esencial: 'Esencial', plus: 'Plus', premium: 'Premium', 'acredita-bach': 'Acredita-Bach' };
 
   // =====================================================================
   //  STRIPE — Enlaces de pago (Payment Links)
@@ -43,14 +50,15 @@
   const STRIPE_LINKS = {
     esencial: '', // p.ej. 'https://buy.stripe.com/xxxxxxxxxxxx'
     plus:     '',
-    premium:  ''
+    premium:  '',
+    'acredita-bach': ''
   };
 
   function getSub()   { try { return localStorage.getItem(SUB_KEY); } catch (e) { return null; } }
   function setSub(p)  { try { localStorage.setItem(SUB_KEY, p); } catch (e) {} }
   function clearSub() { try { localStorage.removeItem(SUB_KEY); } catch (e) {} }
   function isUnlocked() { return !!getSub(); }
-  let activeAreaKey = 'cientifico';
+  let activeAreaKey = 'matematico';
 
   // ---------- helpers ----------
   function escapeHTML(s) {
@@ -59,7 +67,8 @@
 
   // ---------- render area selector ----------
   const grid = document.getElementById('areaGrid');
-  if (grid) {
+  function renderAreaSelector() {
+    if (!grid) return;
     grid.innerHTML = AREAS.map((a) => {
       const data = window.modulesData[a.key] || { subsections: [] };
       const total = data.subsections ? data.subsections.reduce((s, x) => s + x.topics.length, 0) : 0;
@@ -70,7 +79,7 @@
       return `
         <button class="area-btn" data-key="${a.key}" style="--area-c:${a.color}">
           <span class="area-num">Área ${a.num}</span>
-          <span class="area-icon">${AREA_ICONS[a.key]}</span>
+          <span class="area-icon">${AREA_ICONS[a.key] || GENERIC_ICON}</span>
           <h3>${a.label}</h3>
           <div class="meta">${total} temas · ${data.reactivos || '30 reactivos'}</div>
           ${badge}
@@ -115,8 +124,8 @@
     const tQuiz = (window.topicQuizzes && window.topicQuizzes[t.n]) || null;
     if (tQuiz && tQuiz.length) body += renderTopicExam(t.n, tQuiz);
 
-    // Si el tema aún no tiene PDF ni examen, avisamos en lugar de dejarlo "a medias"
-    if (!pdfPath && !(tQuiz && tQuiz.length)) {
+    // Si el tema aún no tiene teoría, PDF ni examen, avisamos en lugar de dejarlo "a medias"
+    if (!pdfPath && !(tQuiz && tQuiz.length) && !t.def) {
       body += `
         <div class="topic-prep">
           <span class="topic-prep-ico">
@@ -205,7 +214,7 @@
           </span>
           <div class="sub-banner-txt">
             <strong>Suscripción activa · Plan ${PLAN_LABELS[plan] || plan}</strong>
-            <span>Tienes acceso completo al material de estudio y a los exámenes de las 5 áreas.</span>
+            <span>Tienes acceso completo al material de estudio y a los exámenes de las 7 áreas.</span>
           </div>
           <button type="button" class="sub-banner-manage" id="subCancel">Cancelar acceso</button>
         </div>`;
@@ -284,7 +293,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
             <h3>Contenido bloqueado</h3>
-            <p>Desbloquea el material de estudio en PDF y los exámenes de práctica con calificación inmediata de las <strong>5 áreas</strong> del examen.</p>
+            <p>Desbloquea el material de estudio en PDF y los exámenes de práctica con calificación inmediata de las <strong>7 áreas</strong> del examen.</p>
             <ul class="paywall-feats">
               <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>PDFs descargables por tema</li>
               <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>Exámenes con calificación al instante</li>
@@ -307,11 +316,34 @@
   }
 
   function areaHasMaterials(data) {
+    if (data.guide) return true;
     return data.subsections.some((sub) => sub.topics.some((t) => {
       const hasPdf = window.topicPDFs && window.topicPDFs[t.n];
       const q = window.topicQuizzes && window.topicQuizzes[t.n];
       return hasPdf || (q && q.length);
     }));
+  }
+
+  function renderAreaGuide(data) {
+    if (!data.guide) return '';
+    const fileName = data.guide.split('/').pop();
+    return `
+      <div class="area-guide">
+        <a class="pdf-btn" href="${data.guide}" download="${fileName}" target="_blank" rel="noopener">
+          <span class="pdf-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              <path d="M14 3v6h6"/>
+              <path d="M12 13v6m0 0l-3-3m3 3l3-3"/>
+            </svg>
+          </span>
+          <span class="pdf-label">
+            <span class="pdf-eyebrow">Guía de estudio completa</span>
+            <span class="pdf-name">Descargar guía en PDF · ${data.title}</span>
+          </span>
+          <span class="pdf-arrow">↓</span>
+        </a>
+      </div>`;
   }
 
   function renderArea(key) {
@@ -342,6 +374,7 @@
         </div>
       </div>
       ${prepBanner}
+      ${renderAreaGuide(data)}
       ${data.subsections.map((sub) => `
         <div class="subsection">
           <h3 class="subsection-title">${sub.title}<span class="tag">${sub.topics.length} temas</span></h3>
@@ -452,13 +485,15 @@
   }
 
   // ---------- bind area selector ----------
-  $$('.area-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      $$('.area-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderAreaOrPaywall(btn.dataset.key);
+  function bindAreaButtons() {
+    $$('.area-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        $$('.area-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderAreaOrPaywall(btn.dataset.key);
+      });
     });
-  });
+  }
 
   // ---------- bind subscription buy buttons ----------
   $$('.sub-buy').forEach((btn) => {
@@ -476,12 +511,22 @@
   });
 
   function proceedToPlan(plan) {
-    const link = STRIPE_LINKS[plan];
+    // Usa window.YESEMS_STRIPE si está disponible, si no el STRIPE_LINKS local
+    const links = (window.YESEMS_STRIPE) || STRIPE_LINKS;
+    const csub = window.YESEMS_CONTENT && window.YESEMS_CONTENT.data && window.YESEMS_CONTENT.data.subscription;
+    const link = (csub && csub.stripeLink) || links[plan];
     if (link) {
-      window.location.href = link;
+      // Prefill del correo del usuario en el checkout de Stripe
+      const user = window.YESEMS_AUTH ? window.YESEMS_AUTH.getUser() : null;
+      const url = (user && user.email)
+        ? link + (link.includes('?') ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(user.email)
+        : link;
+      window.location.href = url;
       return;
     }
-    activatePlan(plan); // modo demo
+    // Sin enlace de pago configurado: redirige a WhatsApp
+    const waMsg = encodeURIComponent('¡Hola! Vengo de la web y quiero contratar el Plan Acredita-Bach por $150 MXN.');
+    window.open('https://api.whatsapp.com/send/?phone=5215648666596&text=' + waMsg, '_blank');
   }
 
   // Si el usuario inició sesión con un plan pendiente, continúa el flujo
@@ -510,8 +555,32 @@
     const params = new URLSearchParams(window.location.search);
     const paid = params.get('paid');
     if (paid && PLAN_LABELS[paid]) {
+      // 1. Guardar en localStorage de inmediato (desbloqueo instantáneo)
       setSub(paid);
-      // limpia la URL para que no quede el parámetro
+      // 2. Guardar en Supabase user_metadata (persistencia multi-dispositivo)
+      function saveMeta() {
+        const auth = window.YESEMS_AUTH;
+        if (auth && auth.updateMeta) {
+          auth.updateMeta({
+            yesems_plan: paid,
+            yesems_plan_date: new Date().toISOString()
+          });
+        }
+      }
+      const authNow = window.YESEMS_AUTH;
+      if (authNow && authNow.getUser()) {
+        saveMeta();
+      } else if (authNow && authNow.onChange) {
+        // Esperar a que auth esté listo
+        authNow.onChange(function onceReady(user) {
+          if (user) {
+            saveMeta();
+            // Quitar listener (reemplazar con no-op)
+            authNow.onChange(() => {});
+          }
+        });
+      }
+      // 3. Limpiar URL
       params.delete('paid');
       params.delete('session_id');
       const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + '#temas';
@@ -519,8 +588,57 @@
     }
   })();
 
-  // open first by default
-  renderSubStatus();
-  const firstBtn = document.querySelector('.area-btn[data-key="cientifico"]');
-  if (firstBtn) { firstBtn.classList.add('active'); renderAreaOrPaywall('cientifico'); }
+  // ---------- verificar suscripción en Supabase al cargar ----------
+  async function checkSupaMeta() {
+    const auth = window.YESEMS_AUTH;
+    if (!auth || !auth.isReal || !auth.isReal() || !auth.getSession) return;
+    try {
+      const session = await auth.getSession();
+      if (!session) return;
+      const meta = session.user && session.user.user_metadata;
+      if (meta && meta.yesems_plan && !getSub()) {
+        // Restaurar desde Supabase si no está en localStorage
+        setSub(meta.yesems_plan);
+        renderSubStatus();
+        renderAreaOrPaywall(activeAreaKey);
+      }
+    } catch (e) {}
+  }
+
+  // ---------- aplicar suscripción editable desde el panel admin ----------
+  function applySubscription() {
+    const s = window.YESEMS_CONTENT && window.YESEMS_CONTENT.data && window.YESEMS_CONTENT.data.subscription;
+    if (!s) return;
+    const set = (sel, val) => { const el = document.querySelector(sel); if (el && val != null) el.textContent = val; };
+    set('.sub-ribbon', s.ribbon);
+    set('.sub-eyebrow', s.eyebrow);
+    set('.sub-head h3', s.title);
+    set('.sub-tag', s.tag);
+    set('.sub-currency', s.currency);
+    set('.sub-amount', s.price);
+    const per = document.querySelector('.sub-period'); if (per && s.period != null) per.innerHTML = s.period;
+    const ul = document.querySelector('.sub-features');
+    if (ul && Array.isArray(s.features)) {
+      ul.innerHTML = s.features.map((f) =>
+        `<li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>${f}</li>`).join('');
+    }
+    const buy = document.querySelector('.sub-buy'); if (buy && s.planId) buy.dataset.plan = s.planId;
+  }
+
+  // ---------- arranque (espera el contenido publicado en Supabase) ----------
+  function boot() {
+    const content = window.YESEMS_CONTENT && window.YESEMS_CONTENT.data;
+    if (content && content.areasOrder && content.areasOrder.length) AREAS = content.areasOrder;
+    renderAreaSelector();
+    bindAreaButtons();
+    applySubscription();
+    renderSubStatus();
+    checkSupaMeta(); // verifica suscripción guardada en Supabase
+    const firstKey = AREAS[0] ? AREAS[0].key : 'matematico';
+    const firstBtn = document.querySelector('.area-btn[data-key="' + firstKey + '"]');
+    if (firstBtn) { firstBtn.classList.add('active'); renderAreaOrPaywall(firstKey); }
+  }
+
+  if (window.YESEMS_CONTENT && window.YESEMS_CONTENT.ready) window.YESEMS_CONTENT.ready.then(boot);
+  else boot();
 })();

@@ -27,6 +27,8 @@
         flowType: 'pkce'             // flujo recomendado y estable para OAuth
       }
     });
+    // Compartir el cliente con content-store.js (evita crear dos clientes).
+    window.YESEMS_SUPA_CLIENT = supa;
   } else if (REAL && !window.supabase) {
     // La librería de Supabase no cargó (¿bloqueada por la red / orden de scripts?)
     console.error('[YESEMS_AUTH] La librería de Supabase no está disponible. ' +
@@ -408,8 +410,28 @@
     else document.addEventListener('DOMContentLoaded', start);
   })();
 
+  // ---------- update user metadata in Supabase ----------
+  async function updateMeta(data) {
+    if (!REAL || !supa) return;
+    try {
+      const { error } = await supa.auth.updateUser({ data });
+      if (error) console.warn('[YESEMS_AUTH] updateMeta:', error.message);
+    } catch (e) {
+      console.warn('[YESEMS_AUTH] updateMeta error:', e.message);
+    }
+  }
+
+  // ---------- get raw session (includes user_metadata) ----------
+  async function getSession() {
+    if (!REAL || !supa) return null;
+    try {
+      const { data } = await supa.auth.getSession();
+      return (data && data.session) ? data.session : null;
+    } catch (e) { return null; }
+  }
+
   // ---------- export ----------
-  window.YESEMS_AUTH = { getUser, onChange, openModal, logout, isReal: () => REAL };
+  window.YESEMS_AUTH = { getUser, onChange, openModal, logout, isReal: () => REAL, updateMeta, getSession };
 
   boot();
 })();
