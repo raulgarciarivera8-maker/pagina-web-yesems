@@ -7,3 +7,17 @@ Desktop.ini
 # Entorno
 .env
 .env.local
+
+# Scripts temporales
+*.py
+*.sh
+*.txt
+!**/*.md
+!**/*.html
+!**/*.css
+!**/*.js
+!**/*.json
+!.gitignore
+
+# Supabase tokens
+.sbp_token
