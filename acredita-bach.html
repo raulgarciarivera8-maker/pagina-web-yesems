@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     var key = getSupabaseAnon();
     if (key) {
       try {
-        var r = await fetch(CONFIG.supabaseUrl + '/functions/v1/create-preference', {
+        var r = await fetch(CONFIG.supabaseUrl + '/functions/v1/createpreference', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
