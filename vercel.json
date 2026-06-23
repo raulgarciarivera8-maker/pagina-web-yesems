@@ -3,7 +3,6 @@
     { "source": "/nosotros.html", "destination": "/", "permanent": true },
     { "source": "/contacto.html", "destination": "/", "permanent": true },
     { "source": "/tecnologia-educativa.html", "destination": "/", "permanent": true },
-    { "source": "/plataforma.html", "destination": "/", "permanent": true },
-    { "source": "/admin.html", "destination": "/", "permanent": true }
+    { "source": "/plataforma.html", "destination": "/", "permanent": true }
   ]
 }
