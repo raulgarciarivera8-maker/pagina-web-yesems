@@ -8,12 +8,15 @@
 
   // Correos autorizados como administradores (compara en minúsculas).
   // Debe coincidir con las reglas de seguridad de docs/SETUP.md
-  const ADMIN_EMAILS = ['raulyeyo12@gmail.com', 'raulgarciarivera08@gmail.com', 'raulgarciarivera8@gmail.com'];
+  // Quién es administrador lo decide el servidor (variable ADMIN_EMAILS de
+  // Render) y llega en el perfil. Antes había aquí una lista escrita a mano
+  // que se desincronizó de la del servidor: el panel dejaba entrar a correos
+  // que luego no podían guardar nada.
   const ADMIN_VERSION = 'v7'; // etiqueta visible para confirmar qué versión está en línea
 
   const $  = (s, r = document) => r.querySelector(s);
   const clone = (o) => (o == null ? o : JSON.parse(JSON.stringify(o)));
-  const isAdmin = (u) => !!(u && u.email && ADMIN_EMAILS.includes(u.email.toLowerCase()));
+  const isAdmin = (u) => !!(u && u.isAdmin);
 
   // ---------- escape ----------
   const esc = (s) => String(s == null ? '' : s)
@@ -484,7 +487,8 @@
         <div class="status-row"><span class="k">API configurada</span><span class="v ${real ? 'pill-ok' : 'pill-warn'}">${real ? 'Sí' : 'No — falta pegar las llaves'}</span></div>
         <div class="status-row"><span class="k">Origen del contenido</span><span class="v">${src === 'api' ? '<span class="pill-ok">Publicado</span>' : 'Contenido de fábrica (aún no publicado)'}</span></div>
         <div class="status-row"><span class="k">Tu sesión</span><span class="v">${esc(currentUser && currentUser.email)}</span></div>
-        <div class="status-row"><span class="k">Administradores</span><span class="v">${ADMIN_EMAILS.map(esc).join('<br>')}</span></div>
+        <div class="status-row"><span class="k">Permiso de administrador</span><span class="v ${currentUser && currentUser.isAdmin ? 'pill-ok' : 'pill-warn'}">${currentUser && currentUser.isAdmin ? 'Sí' : 'No'}</span></div>
+        <div class="status-row"><span class="k">Cambiar administradores</span><span class="v">Variable <code>ADMIN_EMAILS</code> en Render</span></div>
       </div>
       <div class="card">
         <h3>¿Primera vez? Deja el servidor listo</h3>

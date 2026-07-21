@@ -46,6 +46,12 @@ function limpiarEmail(v) {
   return String(v || '').trim().toLowerCase();
 }
 
+function esAdmin(email) {
+  return (process.env.ADMIN_EMAILS || '')
+    .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+    .includes(String(email || '').toLowerCase());
+}
+
 // Lo que el frontend puede ver de un usuario. Nunca sale passwordHash.
 function perfilPublico(u) {
   return {
@@ -53,6 +59,10 @@ function perfilPublico(u) {
     email: u.email,
     name: u.name || u.email.split('@')[0],
     emailVerified: !!u.emailVerified,
+    // El servidor es la única fuente de verdad sobre quién es admin.
+    // El panel lo usa solo para mostrar u ocultar; el permiso real lo
+    // vuelve a comprobar requireAdmin en cada escritura.
+    isAdmin: esAdmin(u.email),
     plan: u.plan || null,
     accessGranted: !!u.accessGranted,
     expiresAt: u.expiresAt || null,
