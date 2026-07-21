@@ -523,26 +523,16 @@
         <button class="add-row" data-act="add-feature">＋ Agregar característica</button>
       </div>
 
-            <div class="card mp-card">
-        <h3><span class="mp-badge">MP</span> Mercado Pago</h3>
-        <p class="card-sub">Configura tu integración con Mercado Pago. El Access Token se usa para crear preferencias de pago. La Public Key va en el frontend. Si están vacíos, el botón “Comenzar ahora” enviará al WhatsApp.</p>
-        <div class="field"><label>Access Token (producción)</label>
-          <div class="mp-token-field">
-            <input class="inp" data-path="subscription.mpAccessToken" value="${escAttr(s.mpAccessToken)}" placeholder="APP_USR-123456789-..." style="font-family:monospace;font-size:12px">
-            <button class="icon-btn mp-eye" data-act="toggle-mp-token" title="Mostrar/ocultar">👁</button>
-          </div>
-        </div>
-        <div class="field"><label>Public Key</label><input class="inp" data-path="subscription.mpPublicKey" value="${escAttr(s.mpPublicKey)}" placeholder="APP_USR-xxxx-xxxx-..." style="font-family:monospace;font-size:12px"></div>
+      <div class="card">
+        <h3>Cobros</h3>
+        <p class="card-sub">
+          Las credenciales de Mercado Pago se configuran en el servidor
+          (<strong>Render → Settings → Environment</strong>), no aquí.
+          El Access Token permite cobrar y reembolsar en tu cuenta, así que no
+          debe viajar al navegador ni guardarse junto al contenido, que es
+          público.
+        </p>
         <div class="field"><label>Identificador del plan</label><input class="inp" data-path="subscription.planId" value="${escAttr(s.planId || 'acredita-bach')}" placeholder="acredita-bach"></div>
-        <div class="mp-help">
-          <p>🔑 <strong>¿Dónde obtengo estos valores?</strong></p>
-          <ol>
-            <li>Ve a <a href="https://www.mercadopago.com.ar/developers/panel" target="_blank">developers.mercadopago.com</a></li>
-            <li>Crea una aplicación o selecciona la existente</li>
-            <li>Copia el <strong>Access Token</strong> (producción) y la <strong>Public Key</strong></li>
-            <li>Pégalos aquí y guarda los cambios</li>
-          </ol>
-        </div>
       </div>
     `;
   }

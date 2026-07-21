@@ -28,7 +28,6 @@ window.YESEMS_SUB_DEFAULT = {
   price:    '150',
   period:   'MXN<br>/ mensual',
   planId:   'acredita-bach',
-  mpAccessToken: '',
   features: [
     'Acceso al curso completo Acredita-Bach',
     'Material de estudio en PDF de las 7 áreas',
