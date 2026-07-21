@@ -22,6 +22,10 @@ administrador lo verán los alumnos en la página.
    `firebaseConfig` que te muestra.
 4. Pega esos valores en **`frontend/js/config/firebase.js`**.
 
+> Ya está hecho para el proyecto **`acreditabach`**: la configuración está
+> puesta y `backend/.firebaserc` apunta a él. Estos pasos solo hacen falta si
+> algún día creas un proyecto distinto.
+
 ---
 
 ## Paso 2 · Activar el inicio de sesión
@@ -61,7 +65,6 @@ Las reglas son el candado real de tus datos. Desde la carpeta `backend/`:
 ```bash
 npm install -g firebase-tools
 firebase login
-firebase use --add          # elige tu proyecto
 firebase deploy --only firestore:rules,storage:rules
 ```
 

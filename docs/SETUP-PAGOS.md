@@ -50,14 +50,15 @@ cd backend
 firebase deploy --only functions
 ```
 
-Al terminar te imprime las URLs. Copia la base, que se ve así:
+Al terminar te imprime las URLs. La base ya viene puesta en el sitio
+(`window.YESEMS_FUNCTIONS_URL` en `frontend/index.html` y
+`frontend/acredita-bach.html`), así que no tienes que copiar nada:
 
 ```
-https://us-central1-TU-PROYECTO.cloudfunctions.net
+https://us-central1-acreditabach.cloudfunctions.net
 ```
 
-Pégala en `window.YESEMS_FUNCTIONS_URL`, dentro de `frontend/index.html` y
-`frontend/acredita-bach.html`.
+Solo compruébala si cambias el proyecto o la región.
 
 ---
 
@@ -66,7 +67,7 @@ Pégala en `window.YESEMS_FUNCTIONS_URL`, dentro de `frontend/index.html` y
 1. Mercado Pago Developers → tu aplicación → **Webhooks** → **Configurar notificaciones**.
 2. URL de producción:
    ```
-   https://us-central1-TU-PROYECTO.cloudfunctions.net/mercadopagoWebhook
+   https://us-central1-acreditabach.cloudfunctions.net/mercadopagoWebhook
    ```
 3. Evento: **Pagos** (`payment`).
 4. Al guardar, Mercado Pago te muestra una **clave secreta**. Cópiala y guárdala:

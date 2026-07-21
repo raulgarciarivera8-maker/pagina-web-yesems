@@ -16,12 +16,13 @@
 //  (sin login real). Al pegarlos, se activa la autenticación real.
 // ============================================================
 window.YESEMS_FIREBASE = {
-  apiKey:            '',
-  authDomain:        '',   // ej: yesems.firebaseapp.com
-  projectId:         '',
-  storageBucket:     '',   // ej: yesems.firebasestorage.app
-  messagingSenderId: '',
-  appId:             ''
+  apiKey:            'AIzaSyD0kQPR7Z2ATIswkS7gHMe09W2k1rymDXw',
+  authDomain:        'acreditabach.firebaseapp.com',
+  projectId:         'acreditabach',
+  storageBucket:     'acreditabach.firebasestorage.app',
+  messagingSenderId: '564218916151',
+  appId:             '1:564218916151:web:b5bfd40618b922137cbeb2',
+  measurementId:     'G-GW5BEQ2T94'
 };
 
 // Correos con permiso de administrador.
