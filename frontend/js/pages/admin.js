@@ -80,6 +80,9 @@
   // justo lo que pasaba. Sin estados intermedios, eso ya no puede ocurrir.
   function showGate(kind, user) {
     gate.hidden = false; bar.hidden = true; shell.hidden = true;
+    // Avisa al vigilante del HTML de que el panel sí arrancó.
+    window.__ADMIN_JS_OK = true;
+    if (gateBody) gateBody.dataset.listo = '1';
     const stamp = diagnostico();
     if (kind === 'loading') {
       gateBody.innerHTML = `<div class="gate-spinner"></div><h1>Cargando…</h1>
@@ -106,7 +109,10 @@
       $('#gateLogout').addEventListener('click', () => window.YESEMS_AUTH.logout());
     }
   }
-  function hideGate() { gate.hidden = true; bar.hidden = false; shell.hidden = false; }
+  function hideGate() {
+    window.__ADMIN_JS_OK = true;
+    if (gateBody) gateBody.dataset.listo = '1';
+    gate.hidden = true; bar.hidden = false; shell.hidden = false; }
 
   // =========================================================
   //  INIT del panel (una sola vez, tras autorizar)

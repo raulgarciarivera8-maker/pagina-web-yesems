@@ -60,6 +60,38 @@
   </div>
 </div>
 
+<script>
+// Vigilante. Este script va incrustado en el HTML, así que se ejecuta aunque
+// los archivos .js externos no lleguen a cargar. Si a los 8 segundos el panel
+// no ha tomado el control, lo dice en pantalla en vez de dejar un "Cargando…"
+// eterno que no explica nada.
+(function () {
+  var t0 = Date.now();
+  setTimeout(function () {
+    var cuerpo = document.getElementById('gateBody');
+    if (!cuerpo || cuerpo.dataset.listo === '1') return;
+
+    var faltan = [];
+    if (typeof window.YESEMS_API_URL === 'undefined') faltan.push('config/api.js');
+    if (typeof window.YESEMS_AUTH    === 'undefined') faltan.push('auth.js');
+    if (typeof window.YESEMS_CONTENT === 'undefined') faltan.push('content.js');
+    if (typeof window.modulesData    === 'undefined') faltan.push('data/modules.js');
+    if (!window.__ADMIN_JS_OK)                        faltan.push('pages/admin.js');
+
+    cuerpo.innerHTML =
+      '<h1>No se pudo cargar el panel</h1>' +
+      '<p>Algunos archivos del sitio no llegaron a tu navegador. Suele ser una ' +
+      'extensión, un antivirus o un bloqueador de anuncios interceptando la descarga.</p>' +
+      '<p style="margin-top:12px;font-size:12.5px;color:#64748b;line-height:1.7">' +
+      'Sin cargar: <strong>' + (faltan.length ? faltan.join(', ') : 'ninguno detectado') + '</strong><br>' +
+      'Tiempo transcurrido: ' + Math.round((Date.now() - t0) / 1000) + ' s</p>' +
+      '<div class="gate-actions" style="margin-top:16px">' +
+      '<button class="gate-btn" onclick="location.reload()">Reintentar</button>' +
+      '<a class="gate-btn alt" href="index.html">Volver al sitio</a></div>';
+  }, 8000);
+})();
+</script>
+
 <!-- ===== Cuerpo del panel ===== -->
 <div class="admin-shell" id="adminShell" hidden="">
   <aside class="admin-side">
