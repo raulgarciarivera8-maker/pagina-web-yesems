@@ -113,19 +113,44 @@
   // =========================================================
   let booted = false;
   async function bootPanel(user) {
-    hideGate();
-    $('#adminEmail').textContent = user.email;
-    $('#adminAvatar').textContent = (user.name || user.email || 'A').trim().charAt(0).toUpperCase();
-    if (booted) return;
+    // Marcamos ANTES de tocar el DOM: si algo falla a mitad, el temporizador
+    // de la puerta no debe devolvernos a la pantalla de login.
+    if (booted) {
+      const e1 = $('#adminEmail'); if (e1) e1.textContent = user.email;
+      hideGate();
+      return;
+    }
     booted = true;
 
-    await window.YESEMS_CONTENT.ready;
-    state.doc = clone(window.YESEMS_CONTENT.data);
-    if (!state.doc.areasOrder) state.doc.areasOrder = clone(window.YESEMS_CONTENT.defaults.areasOrder) || [];
-    if (!state.doc.modules)    state.doc.modules = {};
-    if (!state.doc.quizzes)    state.doc.quizzes = {};
-    if (!state.doc.pdfs)       state.doc.pdfs = {};
-    if (!state.doc.subscription) state.doc.subscription = clone(window.YESEMS_CONTENT.defaults.subscription) || {};
+    try {
+      hideGate();
+      const elEmail = $('#adminEmail');
+      const elAvatar = $('#adminAvatar');
+      if (elEmail) elEmail.textContent = user.email;
+      if (elAvatar) elAvatar.textContent = (user.name || user.email || 'A').trim().charAt(0).toUpperCase();
+    } catch (e) {
+      console.error('[admin] fallo preparando la barra:', e);
+    }
+
+    // El contenido puede tardar si el servidor está dormido, pero el panel
+    // ya está abierto: no se espera a que llegue para dejar de mostrar la
+    // puerta. Si falla, se trabaja con los valores de fábrica.
+    try {
+      await window.YESEMS_CONTENT.ready;
+    } catch (e) {
+      console.error('[admin] no se pudo cargar el contenido:', e);
+    }
+    // Si el contenido no llegó, se parte de un documento vacío en lugar de
+    // reventar aquí: un fallo cargando el temario no debe impedir abrir el
+    // panel, que es justo lo que hacía que pareciera un problema de login.
+    const C = window.YESEMS_CONTENT || {};
+    const defs = C.defaults || {};
+    state.doc = clone(C.data) || {};
+    if (!state.doc.areasOrder) state.doc.areasOrder = clone(defs.areasOrder) || [];
+    if (!state.doc.modules)    state.doc.modules = clone(defs.modules) || {};
+    if (!state.doc.quizzes)    state.doc.quizzes = clone(defs.quizzes) || {};
+    if (!state.doc.pdfs)       state.doc.pdfs = clone(defs.pdfs) || {};
+    if (!state.doc.subscription) state.doc.subscription = clone(defs.subscription) || {};
     state.areaKey = state.doc.areasOrder[0] ? state.doc.areasOrder[0].key : null;
     state.ready = true;
 

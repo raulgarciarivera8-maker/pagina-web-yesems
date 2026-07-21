@@ -27,7 +27,18 @@
   let intentoActual = 1;          // se muestra en la pantalla de carga
   const listeners = [];
 
-  function notify() { listeners.forEach((cb) => { try { cb(currentUser); } catch (e) {} }); }
+  // Un listener que falle no debe tumbar a los demás, pero su error TIENE que
+  // verse: este catch vacío ocultó durante horas un fallo al abrir el panel,
+  // que desde fuera parecía "el login no funciona".
+  function notify() {
+    listeners.forEach((cb) => {
+      try { cb(currentUser); }
+      catch (e) {
+        console.error('[auth] un listener falló:', e);
+        window.__YESEMS_LAST_AUTH_ERROR = 'fallo al abrir: ' + (e && e.message ? e.message : e);
+      }
+    });
+  }
   function onChange(cb) { listeners.push(cb); if (currentUser !== undefined) cb(currentUser); }
   function getUser() { return currentUser; }
   function getToken() { return token; }
