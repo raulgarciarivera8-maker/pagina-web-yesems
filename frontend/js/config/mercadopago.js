@@ -8,9 +8,9 @@
 //  Con el Access Token cualquiera podría cobrar y reembolsar
 //  pagos en tu cuenta.
 //
-//  El Access Token va en el backend, guardado como secreto:
-//      cd backend
-//      firebase functions:secrets:set MERCADO_PAGO_ACCESS_TOKEN
+//  El Access Token va en el backend, como variable de entorno:
+//      Render → tu servicio → Settings → Environment
+//      MERCADO_PAGO_ACCESS_TOKEN
 //
 //  Aquí solo va la PUBLIC KEY, que sí es pública por diseño.
 //  La obtienes en:

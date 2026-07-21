@@ -510,12 +510,12 @@
   //
   //   - handleStripeReturn(): desbloqueaba el curso con solo leer "?paid=" de
   //     la URL, así que cualquiera podía escribirla a mano y entrar gratis.
-  //   - checkSupaMeta(): leía el plan de user_metadata de Supabase, campo que
-  //     en Firebase no existe.
+  //   - checkSupaMeta(): leía el plan de un campo de Supabase que ya no
+  //     existe en el modelo actual.
   //
   // Hoy el acceso lo resuelve js/pages/checkout.js, que siempre lo confirma
-  // contra la colección user_access de Firestore (que solo escribe el webhook
-  // de pagos, con credenciales de servidor).
+  // contra la API (el acceso solo lo marca el webhook de pagos, desde el
+  // servidor).
 
   // ---------- aplicar suscripción editable desde el panel admin ----------
   function applySubscription() {

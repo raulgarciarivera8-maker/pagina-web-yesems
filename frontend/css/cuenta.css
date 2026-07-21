@@ -1,0 +1,143 @@
+/* ============================================================
+   Páginas de cuenta (verificar.html y restablecer.html)
+   Pantallas sueltas a las que llegan los enlaces del correo.
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f0f4f8;
+  color: #1a1a2e;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cuenta-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.cuenta-card {
+  background: #fff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(10, 30, 63, .09);
+}
+
+.cuenta-logo {
+  font-weight: 700;
+  font-size: 21px;
+  letter-spacing: .3px;
+  color: #0a1e3f;
+  margin-bottom: 28px;
+}
+.cuenta-logo span { color: #5cb85c; }
+
+.cuenta-estado h1 {
+  font-size: 21px;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+.cuenta-estado p {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Icono de resultado */
+.cuenta-icono {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 31px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ok  .cuenta-icono { background: #e6f7ea; color: #2e9e4f; }
+.err .cuenta-icono { background: #fdeaea; color: #d64545; }
+
+/* Spinner de carga */
+.spinner {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 18px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #009EE3;
+  border-radius: 50%;
+  animation: girar .8s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* Quien prefiere menos movimiento no ve el giro. */
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: #e2e8f0; }
+}
+
+/* Formulario */
+.cuenta-form {
+  margin-top: 24px;
+  text-align: left;
+}
+
+.cuenta-form label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin: 14px 0 6px;
+}
+
+.cuenta-form input {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  border: 1px solid #d8dfe8;
+  border-radius: 10px;
+  background: #fbfcfe;
+  transition: border-color .15s, box-shadow .15s;
+}
+.cuenta-form input:focus {
+  outline: none;
+  border-color: #009EE3;
+  box-shadow: 0 0 0 3px rgba(0, 158, 227, .13);
+}
+
+.cuenta-btn {
+  display: block;
+  width: 100%;
+  margin-top: 22px;
+  padding: 13px 20px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  background: #009EE3;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.cuenta-btn:hover  { background: #0089c7; }
+.cuenta-btn:disabled { opacity: .6; cursor: default; }
+
+.cuenta-error {
+  margin-top: 14px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #b03030;
+  background: #fdeaea;
+  border-radius: 8px;
+}

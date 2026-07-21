@@ -1,9 +1,9 @@
 # Configuración de Pagos con Mercado Pago
 
-Requisito previo: tener Firebase listo según [SETUP-FIREBASE.md](SETUP-FIREBASE.md).
+Requisito previo: tener la API funcionando según [SETUP.md](SETUP.md).
 
-No hay que crear tablas a mano. La colección `user_access` de Firestore se crea
-sola con el primer pago, y sus permisos ya están en `backend/firestore.rules`.
+No hay que crear nada a mano: el acceso pagado se guarda en el propio
+documento del usuario en MongoDB, y lo escribe solo el webhook.
 
 ---
 
@@ -18,47 +18,27 @@ sola con el primer pago, y sus permisos ya están en `backend/firestore.rules`.
 
 ---
 
-## Paso 2 · Guardar el Access Token como secreto
+## Paso 2 · Guardar el Access Token en Render
 
-Desde la carpeta `backend/`:
+**Render → tu servicio → Settings → Environment → Add Environment Variable:**
 
-```bash
-firebase functions:secrets:set MERCADO_PAGO_ACCESS_TOKEN
+```
+MERCADO_PAGO_ACCESS_TOKEN = APP_USR-...
 ```
 
-Te lo pedirá por teclado y lo guarda cifrado en Google Cloud. Nunca aparece en
-el repositorio.
+Render lo guarda cifrado y nunca aparece en el repositorio.
+
+Comprueba también que `SITE_URL` apunte a tu dominio de Vercel: es la
+dirección a la que Mercado Pago devuelve al usuario después de pagar.
 
 ---
 
-## Paso 3 · Configurar la URL del sitio
+## Paso 3 · Reiniciar el servicio
 
-Crea el archivo `backend/functions/.env` (copiando `.env.example`):
+Al guardar una variable, Render redespliega solo. Espera a que quede **Live**.
 
-```
-SITE_URL=https://pagina-web-yesems.vercel.app
-```
-
-Es la dirección a la que Mercado Pago devuelve al usuario después de pagar.
-
----
-
-## Paso 4 · Desplegar las funciones
-
-```bash
-cd backend
-firebase deploy --only functions
-```
-
-Al terminar te imprime las URLs. La base ya viene puesta en el sitio
-(`window.YESEMS_FUNCTIONS_URL` en `frontend/index.html` y
-`frontend/acredita-bach.html`), así que no tienes que copiar nada:
-
-```
-https://us-central1-acreditabach.cloudfunctions.net
-```
-
-Solo compruébala si cambias el proyecto o la región.
+La URL de la API ya está en `frontend/js/config/api.js`, así que no hay que
+copiar nada más aquí.
 
 ---
 
@@ -67,15 +47,12 @@ Solo compruébala si cambias el proyecto o la región.
 1. Mercado Pago Developers → tu aplicación → **Webhooks** → **Configurar notificaciones**.
 2. URL de producción:
    ```
-   https://us-central1-acreditabach.cloudfunctions.net/mercadopagoWebhook
+   https://TU-SERVICIO.onrender.com/api/pagos/webhook
    ```
 3. Evento: **Pagos** (`payment`).
 4. Al guardar, Mercado Pago te muestra una **clave secreta**. Cópiala y guárdala:
 
-```bash
-firebase functions:secrets:set MERCADO_PAGO_WEBHOOK_SECRET
-firebase deploy --only functions      # vuelve a desplegar para que la tome
-```
+Guárdala en Render como `MERCADO_PAGO_WEBHOOK_SECRET`.
 
 > Este paso **no es opcional**. Sin esa clave, cualquiera que descubra la URL
 > del webhook podría enviar un aviso de pago falso y regalarse el curso. Con
@@ -103,11 +80,10 @@ de Mercado Pago.
 | Síntoma | Qué revisar |
 |---|---|
 | El botón no redirige | ¿Está puesto `window.YESEMS_FUNCTIONS_URL`? Mira la consola del navegador. |
-| Responde 401 al comprar | El usuario no tiene sesión iniciada, o el token expiró. Vuelve a entrar. |
-| Pagó pero sigue bloqueado | Revisa los logs: `firebase functions:log --only mercadopagoWebhook`. |
+| Responde 401 al comprar | Sin sesión iniciada o token expirado. Vuelve a entrar. |
+| Pagó pero sigue bloqueado | Revisa los logs: `Render → tu servicio → Logs`. |
 | El webhook responde 401 | La clave `MERCADO_PAGO_WEBHOOK_SECRET` no coincide con la del panel de Mercado Pago. |
-| Sigue bloqueado tras un minuto | Mira si existe el documento en Firestore → `user_access` → tu correo. |
+| Sigue bloqueado tras un minuto | Mira el usuario en Atlas: debe tener `accessGranted: true`. |
 
-> Nota: el desbloqueo del contenido en pantalla es solo visual. Quien de verdad
-> decide quién ve qué son las reglas de `backend/firestore.rules` y
-> `backend/storage.rules`.
+> Nota: el desbloqueo del contenido en pantalla es solo visual. Quien decide
+> de verdad si alguien pagó es el servidor.

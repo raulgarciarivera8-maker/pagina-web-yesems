@@ -1,13 +1,13 @@
 // ============================================================
 //  PANEL DE ADMINISTRADOR · YES EMS
 //  Edita áreas, temas, PDFs, exámenes y suscripción, y los guarda
-//  en Firebase para que los alumnos los vean en la página principal.
+//  en la base de datos para que los alumnos los vean en la página principal.
 // ============================================================
 (function () {
   'use strict';
 
   // Correos autorizados como administradores (compara en minúsculas).
-  // Debe coincidir con las reglas de seguridad de SETUP-FIREBASE.md
+  // Debe coincidir con las reglas de seguridad de docs/SETUP.md
   const ADMIN_EMAILS = ['raulyeyo12@gmail.com', 'raulgarciarivera08@gmail.com', 'raulgarciarivera8@gmail.com'];
   const ADMIN_VERSION = 'v7'; // etiqueta visible para confirmar qué versión está en línea
 
@@ -105,9 +105,9 @@
   function updateSourcePill() {
     const pill = $('#adminSource');
     if (!window.YESEMS_CONTENT.isReal()) {
-      pill.textContent = 'Firebase no configurado'; pill.className = 'admin-source local'; return;
+      pill.textContent = 'API no configurada'; pill.className = 'admin-source local'; return;
     }
-    if (window.YESEMS_CONTENT.source === 'firebase') {
+    if (window.YESEMS_CONTENT.source === 'api') {
       pill.textContent = '● Publicado en línea'; pill.className = 'admin-source live';
     } else {
       pill.textContent = 'Contenido de fábrica'; pill.className = 'admin-source local';
@@ -155,31 +155,24 @@
   async function save() {
     const btn = $('#btnSave');
     if (!window.YESEMS_CONTENT.isReal()) {
-      toast('Firebase no está configurado. Revisa SETUP-FIREBASE.md', 'err'); return;
+      toast('La API no está configurada. Revisa docs/SETUP.md', 'err'); return;
     }
     btn.disabled = true; btn.textContent = 'Guardando…';
     try {
-      await window.YESEMS_CONTENT.save(state.doc, currentUser.email);
+      await window.YESEMS_CONTENT.save(state.doc);
       markDirty(false);
       updateSourcePill();
       toast('Cambios guardados y publicados ✓', 'ok');
     } catch (err) {
       console.error(err);
-      // Firebase reporta el motivo en err.code, no en el texto del mensaje.
-      let msg = 'No se pudo guardar.';
-      if (err.code === 'permission-denied') {
-        // La causa más común: las reglas exigen el correo verificado.
-        const u = window.YESEMS_AUTH && window.YESEMS_AUTH.getUser();
-        msg = 'Tu cuenta no tiene permiso para publicar. Revisa que ' +
-              (u && u.email ? '“' + u.email + '”' : 'tu correo') +
-              ' esté en la lista de administradores de firestore.rules y que hayas ' +
-              'confirmado el correo de verificación que te envió Firebase.';
-      } else if (err.code === 'unavailable' || err.code === 'deadline-exceeded') {
-        msg = 'Sin conexión con Firebase. Revisa tu internet e inténtalo de nuevo.';
-      } else if (err.code === 'not-found' || err.code === 'failed-precondition') {
-        msg = 'Falta crear la base de datos Firestore. Abre docs/SETUP-FIREBASE.md y sigue el Paso 3.';
-      } else if (err.code === 'unauthenticated') {
+      // La API responde con el mensaje ya redactado; err.status dice qué pasó.
+      let msg = err.message || 'No se pudo guardar.';
+      if (err.status === 401) {
         msg = 'Tu sesión expiró. Vuelve a iniciar sesión e inténtalo de nuevo.';
+      } else if (err.status === 403) {
+        msg = 'Tu cuenta no tiene permiso para publicar. Revisa que tu correo esté en ADMIN_EMAILS del servidor.';
+      } else if (err.status === 0) {
+        msg = 'No se pudo conectar con el servidor. Si lleva rato sin uso, tarda unos segundos en despertar: inténtalo otra vez.';
       }
       toast(msg, 'err');
     } finally {
@@ -488,24 +481,24 @@
       <div class="main-head"><h2>Estado y ayuda</h2><p>Comprueba la conexión y consulta cómo dejar todo listo.</p></div>
       <div class="card">
         <h3>Conexión</h3>
-        <div class="status-row"><span class="k">Firebase configurado</span><span class="v ${real ? 'pill-ok' : 'pill-warn'}">${real ? 'Sí' : 'No — falta pegar las llaves'}</span></div>
-        <div class="status-row"><span class="k">Origen del contenido</span><span class="v">${src === 'firebase' ? '<span class="pill-ok">Publicado en Firebase</span>' : 'Contenido de fábrica (aún no publicado)'}</span></div>
+        <div class="status-row"><span class="k">API configurada</span><span class="v ${real ? 'pill-ok' : 'pill-warn'}">${real ? 'Sí' : 'No — falta pegar las llaves'}</span></div>
+        <div class="status-row"><span class="k">Origen del contenido</span><span class="v">${src === 'api' ? '<span class="pill-ok">Publicado</span>' : 'Contenido de fábrica (aún no publicado)'}</span></div>
         <div class="status-row"><span class="k">Tu sesión</span><span class="v">${esc(currentUser && currentUser.email)}</span></div>
         <div class="status-row"><span class="k">Administradores</span><span class="v">${ADMIN_EMAILS.map(esc).join('<br>')}</span></div>
       </div>
       <div class="card">
-        <h3>¿Primera vez? Deja Firebase listo</h3>
+        <h3>¿Primera vez? Deja el servidor listo</h3>
         <div class="help-steps">
           Para que <strong>lo que editas lo vean los alumnos</strong>, hay que crear una tabla y un almacén de archivos
-          en tu proyecto de Firebase (una sola vez, sin programar). El paso a paso con el código exacto para copiar y
-          pegar está en el archivo <code>SETUP-FIREBASE.md</code> del proyecto.
+          en tu servidor (una sola vez, sin programar). El paso a paso con el código exacto para copiar y
+          pegar está en el archivo <code>docs/SETUP.md</code> del proyecto.
           <br><br>
           Mientras tanto, la página principal sigue funcionando con el contenido de fábrica. El botón
           <strong>Guardar cambios</strong> solo podrá publicar cuando la tabla y las políticas existan.
         </div>
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-          <a class="admin-btn ghost" style="color:var(--ink);border-color:var(--line-strong)" href="../docs/SETUP-FIREBASE.md" target="_blank" rel="noopener">Abrir guía de configuración</a>
-          <a class="admin-btn ghost" style="color:var(--ink);border-color:var(--line-strong)" href="https://console.firebase.google.com" target="_blank" rel="noopener">Ir a Firebase ↗</a>
+          <a class="admin-btn ghost" style="color:var(--ink);border-color:var(--line-strong)" href="../docs/SETUP.md" target="_blank" rel="noopener">Abrir guía de configuración</a>
+          <a class="admin-btn ghost" style="color:var(--ink);border-color:var(--line-strong)" href="https://dashboard.render.com" target="_blank" rel="noopener">Ir a Render ↗</a>
         </div>
       </div>
     `;
@@ -554,27 +547,21 @@
     const file = el.files && el.files[0];
     if (!file) return;
     if (file.type && file.type !== 'application/pdf') { toast('El archivo debe ser un PDF.', 'err'); el.value = ''; return; }
-    if (!window.YESEMS_CONTENT.isReal()) { toast('Configura Firebase para subir archivos (SETUP-FIREBASE.md).', 'err'); el.value = ''; return; }
+    if (!window.YESEMS_CONTENT.isReal()) { toast('Configura la API para subir archivos (docs/SETUP.md).', 'err'); el.value = ''; return; }
     toast('Subiendo PDF…', '');
     try {
-      const url = await window.YESEMS_CONTENT.uploadPDF(file, currentUser.email);
+      const url = await window.YESEMS_CONTENT.uploadPDF(file);
       setPath(state.doc, path, url);
       markDirty(true);
       toast('PDF subido ✓ — recuerda Guardar cambios', 'ok');
       renderMain();
     } catch (err) {
       console.error(err);
-      // Códigos de Cloud Storage (storage/…).
-      let msg = 'No se pudo subir el archivo.';
-      if (err.code === 'storage/unauthorized') {
-        msg = 'Sin permiso para subir. Revisa que tu correo esté en storage.rules, ' +
-              'que lo hayas verificado, y que el PDF pese menos de 25 MB.';
-      } else if (err.code === 'storage/unauthenticated') {
+      let msg = err.message || 'No se pudo subir el archivo.';
+      if (err.status === 401) {
         msg = 'Tu sesión expiró. Vuelve a iniciar sesión e inténtalo de nuevo.';
-      } else if (err.code === 'storage/retry-limit-exceeded' || err.code === 'storage/canceled') {
-        msg = 'La subida se interrumpió. Revisa tu conexión e inténtalo de nuevo.';
-      } else if (err.code === 'storage/unknown') {
-        msg = 'Falta activar Cloud Storage. Abre docs/SETUP-FIREBASE.md y sigue el Paso 4.';
+      } else if (err.status === 403) {
+        msg = 'Tu cuenta no tiene permiso para subir archivos.';
       }
       toast(msg, 'err');
       el.value = '';

@@ -1,13 +1,13 @@
 // ============================================================
-//  CHECKOUT  ·  YES EMS  (Mercado Pago + Firebase)
+//  CHECKOUT  ·  YES EMS  (Mercado Pago)
 //  ------------------------------------------------------------
-//  - Consulta si el usuario tiene acceso pagado (Firestore).
-//  - Crea la preferencia de pago llamando a la Cloud Function.
+//  - Consulta si el usuario tiene acceso pagado (API).
+//  - Crea la preferencia de pago llamando a la API.
 //  - Desbloquea el contenido cuando el acceso está confirmado.
 //
 //  NOTA DE SEGURIDAD: este archivo solo controla lo que se VE.
-//  El candado real vive en firestore.rules / storage.rules; nunca
-//  confíes en el navegador para decidir quién pagó.
+//  Quien decide si alguien pagó es el servidor; nunca confíes en el
+//  navegador para eso.
 // ============================================================
 (function() {
   'use strict';
@@ -21,14 +21,8 @@
     whatsapp: 'https://api.whatsapp.com/send/?phone=5215648666596&text=Quiero%20acceder%20al%20curso%20Acredita-Bach%20de%20YES%20EMS',
   };
 
-  // URL base de las Cloud Functions, p.ej.
-  // https://us-central1-TU-PROYECTO.cloudfunctions.net
-  function functionsBase() {
-    return (window.YESEMS_FUNCTIONS_URL || '').replace(/\/$/, '');
-  }
-
-  function db() {
-    return (window.YESEMS_FB_APP && window.firebase) ? firebase.firestore() : null;
+  function apiBase() {
+    return (window.YESEMS_API_URL || '').replace(/\/$/, '');
   }
 
   // ─── CACHÉ LOCAL ──────────────────────────────
@@ -84,20 +78,17 @@
     if (period) period.innerHTML = CONFIG.currency + '<br>' + CONFIG.period;
   }
 
-  // ─── VERIFICAR ACCESO EN FIRESTORE ────────────
-  // El documento user_access/{email} lo escribe SOLO el webhook de pago,
-  // con credenciales de servidor. El navegador nunca puede crearlo.
-  async function checkAccess(email) {
-    if (!email) return false;
-    const store = db();
-    if (!store) return false;
+  // ─── VERIFICAR ACCESO CONTRA LA API ───────────
+  // El acceso lo marca SOLO el webhook de pago, desde el servidor. El
+  // navegador nunca puede otorgárselo a sí mismo.
+  async function checkAccess() {
+    const auth = window.YESEMS_AUTH;
+    if (!auth || !auth.refresh) return false;
     try {
-      const snap = await store.collection('user_access').doc(email.toLowerCase()).get();
-      if (!snap.exists) return false;
-      const d = snap.data();
-      if (d.access_granted !== true) return false;
-      if (d.expires_at && new Date(d.expires_at) <= new Date()) return false;
-      saveAccess(email, d.expires_at);
+      const user = await auth.refresh();
+      if (!user || user.accessGranted !== true) return false;
+      if (user.expiresAt && new Date(user.expiresAt) <= new Date()) return false;
+      saveAccess(user.email, user.expiresAt);
       unlockContent();
       return true;
     } catch (e) {
@@ -107,24 +98,21 @@
   }
 
   // ─── PREFERENCIA DE MERCADO PAGO ──────────────
-  async function createPreference(email) {
-    const base = functionsBase();
+  async function createPreference() {
+    const base = apiBase();
     if (!base) {
-      console.warn('[checkout] falta window.YESEMS_FUNCTIONS_URL');
+      console.warn('[checkout] falta window.YESEMS_API_URL');
       return null;
     }
     try {
-      // Enviamos el token de Firebase para que el backend sepa quién compra
-      // y nadie pueda generar pagos a nombre de otra persona.
-      const session = window.YESEMS_AUTH && await window.YESEMS_AUTH.getSession();
-      const headers = { 'Content-Type': 'application/json' };
-      if (session && session.access_token) {
-        headers.Authorization = 'Bearer ' + session.access_token;
-      }
-      const r = await fetch(base + '/createPreference', {
+      // El token identifica al comprador: el servidor toma de ahí el correo,
+      // así nadie puede generar un pago a nombre de otra persona.
+      const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
+      if (!token) return null;
+      const r = await fetch(base + '/api/pagos/preferencia', {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ email: email || '', plan: CONFIG.plan }),
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ plan: CONFIG.plan }),
       });
       if (r.ok) {
         const d = await r.json();
@@ -141,7 +129,7 @@
   // ─── REGRESO DESDE MERCADO PAGO ───────────────
   // Antes bastaba con escribir "?payment=success" a mano para desbloquear
   // todo el curso. Ahora ese parámetro solo dispara la verificación real
-  // contra Firestore: si el webhook no registró el pago, no se abre nada.
+  // contra el servidor: si el webhook no registró el pago, no se abre nada.
   async function handlePaymentReturn() {
     const p = new URLSearchParams(window.location.search);
     if (p.get('payment') !== 'success') return false;
@@ -151,13 +139,12 @@
     }
 
     const user = window.YESEMS_AUTH && window.YESEMS_AUTH.getUser();
-    const email = user && user.email;
-    if (!email) return false;
+    if (!user) return false;
 
     // El webhook de Mercado Pago puede tardar unos segundos en llegar:
     // reintentamos un poco antes de darnos por vencidos.
     for (let i = 0; i < 5; i++) {
-      if (await checkAccess(email)) return true;
+      if (await checkAccess()) return true;
       await new Promise((r) => setTimeout(r, 2000));
     }
     console.warn('[checkout] el pago aún no se refleja; se reintentará al recargar.');
@@ -188,7 +175,7 @@
         var original = btn.textContent;
         btn.textContent = 'Conectando con Mercado Pago…';
         btn.disabled = true;
-        var url = await createPreference(email);
+        var url = await createPreference();
         if (url) {
           window.location.href = url;
         } else {
@@ -214,8 +201,8 @@
     // de sesión, para que cerrar sesión vuelva a poner el candado).
     if (window.YESEMS_AUTH) {
       window.YESEMS_AUTH.onChange(async function(user) {
-        if (user && user.email) {
-          await checkAccess(user.email);
+        if (user) {
+          await checkAccess();
         } else {
           clearAccess();
         }

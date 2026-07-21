@@ -30,15 +30,10 @@ de la raíz siga teniendo `"outputDirectory": "frontend"`.
 
 1. Abre tu sitio: `https://tu-proyecto.vercel.app`
 2. Abre el panel: `https://tu-proyecto.vercel.app/admin.html`
-3. Para que funcione el **login con Google**, agrega tu dominio de Vercel en
-   Firebase → **Authentication → Settings → Authorized domains**
-   (ver [SETUP-FIREBASE.md](SETUP-FIREBASE.md), Paso 2).
-4. Pon la URL del sitio en `backend/functions/.env` (variable `SITE_URL`), para
-   que Mercado Pago sepa a dónde regresar al usuario después de pagar.
-5. Pega la URL de tus Cloud Functions en `window.YESEMS_FUNCTIONS_URL`, dentro
-   de `frontend/index.html` y `frontend/acredita-bach.html`. La obtienes al
-   correr `firebase deploy --only functions`.
+3. Pon la URL de tu API de Render en `frontend/js/config/api.js` y haz push.
+   Mientras esté vacía, el sitio funciona en modo demostración.
+4. En Render, la variable `SITE_URL` debe apuntar a tu dominio de Vercel:
+   es lo que permite que el navegador llame a la API (CORS) y que Mercado
+   Pago sepa a dónde devolver al usuario tras pagar.
 
-> La configuración de Firebase que está en `frontend/js/config/firebase.js` es
-> **pública** y es seguro que viaje al navegador. Lo que protege tu información
-> son las reglas de `backend/firestore.rules` y `backend/storage.rules`.
+Todo lo demás está en [SETUP.md](SETUP.md).

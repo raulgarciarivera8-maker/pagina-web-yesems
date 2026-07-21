@@ -1,41 +1,72 @@
 // ============================================================
-//  AUTENTICACIÓN  ·  YES EMS  (Etapa 1)
+//  AUTENTICACIÓN  ·  YES EMS
 //  ------------------------------------------------------------
-//  - Login / registro con correo y contraseña
+//  - Registro y login con correo y contraseña
+//  - Verificación de correo obligatoria antes de entrar
+//  - Recuperación de contraseña
 //  - Sesión persistente + estado en el header
-//  - Modo DEMO si aún no hay llaves de Firebase configuradas
+//  - Modo DEMO si aún no hay API configurada
+//
+//  Habla con la API de Render. La sesión es un JWT guardado en
+//  localStorage y enviado en la cabecera Authorization.
 //
 //  Expone:  window.YESEMS_AUTH = {
-//     getUser(), onChange(cb), openModal(), logout(), isReal()
+//     getUser(), getToken(), onChange(cb), openModal(), logout(),
+//     isReal(), recoverPassword(), refresh()
 //  }
 // ============================================================
 (function () {
-  const cfg = window.YESEMS_FIREBASE || {};
-  const REAL = !!(cfg.apiKey && cfg.projectId);
-  let auth = null;
+  const API = (window.YESEMS_API_URL || '').replace(/\/$/, '');
+  const REAL = !!API;
+  const TOKEN_KEY = 'yesems_token';
   let currentUser = null;
+  let token = null;
   const listeners = [];
-
-  // ---------- init Firebase (si hay configuración) ----------
-  if (REAL && window.firebase) {
-    const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
-    // Compartir la app con content.js (evita inicializar dos veces).
-    window.YESEMS_FB_APP = app;
-    auth = firebase.auth();
-    // Sesión persistente en localStorage: sobrevive al cierre del navegador.
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .catch((e) => console.warn('[YESEMS_AUTH] persistencia:', e.message));
-  } else if (REAL && !window.firebase) {
-    // La librería de Firebase no cargó (¿bloqueada por la red / orden de scripts?)
-    console.error('[YESEMS_AUTH] La librería de Firebase no está disponible. ' +
-      'Verifica que los <script> de firebase-*-compat.js carguen ANTES de auth.js.');
-  }
 
   function notify() { listeners.forEach((cb) => { try { cb(currentUser); } catch (e) {} }); }
   function onChange(cb) { listeners.push(cb); if (currentUser !== undefined) cb(currentUser); }
   function getUser() { return currentUser; }
+  function getToken() { return token; }
 
-  // ---------- DEMO storage (sin Supabase) ----------
+  // ---------- almacenamiento de la sesión ----------
+  function saveToken(t) {
+    token = t;
+    try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+  }
+  function loadToken() {
+    try { return localStorage.getItem(TOKEN_KEY); } catch (e) { return null; }
+  }
+
+  // ---------- llamadas a la API ----------
+  // Lanza un error con .status y .data para que quien llame decida
+  // qué mensaje mostrar.
+  async function call(path, { method = 'GET', body, auth: withAuth } = {}) {
+    const headers = {};
+    if (body) headers['Content-Type'] = 'application/json';
+    if (withAuth && token) headers.Authorization = 'Bearer ' + token;
+
+    let r;
+    try {
+      r = await fetch(API + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    } catch (e) {
+      // Render duerme el servicio en el plan gratuito: la primera
+      // petición puede tardar o fallar mientras despierta.
+      const err = new Error('No se pudo conectar con el servidor. Inténtalo de nuevo en unos segundos.');
+      err.status = 0;
+      throw err;
+    }
+
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const err = new Error(data.error || 'Ocurrió un error. Inténtalo de nuevo.');
+      err.status = r.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
+  }
+
+  // ---------- MODO DEMO (sin API configurada) ----------
   const DEMO_KEY = 'yesems_demo_user';
   function demoLoad() { try { return JSON.parse(localStorage.getItem(DEMO_KEY) || 'null'); } catch (e) { return null; } }
   function demoSave(u) { try { localStorage.setItem(DEMO_KEY, JSON.stringify(u)); } catch (e) {} }
@@ -46,14 +77,10 @@
   // ======================================================
   async function signUp(email, password, name) {
     if (REAL) {
-      const cred = await auth.createUserWithEmailAndPassword(email, password);
-      // Firebase no acepta metadata arbitraria: el nombre va en displayName.
-      if (name) await cred.user.updateProfile({ displayName: name });
-      // Firebase inicia sesión de inmediato; la verificación de correo es
-      // opcional y no bloquea el acceso.
-      return { needsConfirm: false };
+      await call('/api/auth/registro', { method: 'POST', body: { email, password, name } });
+      // La cuenta queda creada pero inactiva: hay que confirmar el correo.
+      return { needsConfirm: true };
     }
-    // DEMO
     const u = { email, name: name || email.split('@')[0], demo: true };
     demoSave(u); currentUser = u; notify();
     return { needsConfirm: false };
@@ -61,45 +88,34 @@
 
   async function signIn(email, password) {
     if (REAL) {
-      await auth.signInWithEmailAndPassword(email, password);
+      const d = await call('/api/auth/login', { method: 'POST', body: { email, password } });
+      saveToken(d.token);
+      currentUser = d.user;
+      notify();
       return;
     }
-    // DEMO
     const u = { email, name: email.split('@')[0], demo: true };
     demoSave(u); currentUser = u; notify();
   }
 
-  // Envía el correo de recuperación. A diferencia de Supabase, Firebase aloja
-  // la pantalla de "escribe tu nueva contraseña", así que aquí no hace falta
-  // construir ese formulario: el usuario la cambia y vuelve al sitio a entrar.
   async function recoverPassword(email) {
-    if (REAL && auth) {
-      await auth.sendPasswordResetEmail(email, {
-        url: window.location.origin + window.location.pathname
-      });
-      return true;
-    }
-    return false;
+    if (!REAL) return false;
+    await call('/api/auth/recuperar', { method: 'POST', body: { email } });
+    return true;
+  }
+
+  async function resendVerification(email) {
+    if (!REAL) return false;
+    await call('/api/auth/reenviar', { method: 'POST', body: { email } });
+    return true;
   }
 
   async function logout() {
-    if (REAL) {
-      if (!auth) { currentUser = null; notify(); return; }
-      try {
-        await auth.signOut();
-      } catch (e) {
-        // signOut puede fallar si no hay conexión. Aun así forzamos el estado
-        // deslogueado para que el usuario no quede atrapado en la sesión.
-        console.warn('[YESEMS_AUTH] signOut falló, limpiando localmente:', e.message);
-      }
-      // GARANTÍA de UI: forzamos el estado deslogueado aunque el evento
-      // onAuthStateChange tarde o no dispare.
-      currentUser = null;
-      notify();
-    } else {
-      demoClear(); currentUser = null; notify();
-    }
-    // cierra el menú de cuenta si quedó abierto
+    // La sesión es un JWT: basta con olvidarlo en este navegador.
+    saveToken(null);
+    currentUser = null;
+    demoClear();
+    notify();
     const menu = document.getElementById('acctMenu');
     if (menu) menu.hidden = true;
   }
@@ -107,31 +123,32 @@
   // ======================================================
   //  SESIÓN INICIAL
   // ======================================================
+  // Vuelve a preguntar por el perfil: así el acceso pagado y el nombre
+  // se refrescan aunque el token siga siendo el mismo.
+  async function refresh() {
+    if (!REAL || !token) return null;
+    try {
+      const d = await call('/api/auth/yo', { auth: true });
+      currentUser = d.user;
+      notify();
+      return d.user;
+    } catch (e) {
+      // 401 = token vencido o cuenta borrada: se cierra la sesión.
+      // Otros errores (servidor dormido) no deben desloguear al usuario.
+      if (e.status === 401) { saveToken(null); currentUser = null; notify(); }
+      return null;
+    }
+  }
+
   async function boot() {
     if (REAL) {
-      if (!auth) { notify(); return; }
-      // onAuthStateChanged dispara una primera vez con la sesión restaurada
-      // (o con null si no hay), así que sirve de arranque y de suscripción.
-      // Firebase resuelve la persistencia desde localStorage sin ir a la red,
-      // por eso aquí no hace falta el timeout que necesitaba Supabase.
-      auth.onAuthStateChanged((u) => {
-        currentUser = u ? mapUser(u) : null;
-        notify();
-        if (u) closeModal();
-      });
+      token = loadToken();
+      if (!token) { notify(); return; }
+      await refresh();
     } else {
       currentUser = demoLoad();
       notify();
     }
-  }
-
-  function mapUser(u) {
-    return {
-      id: u.uid,
-      email: u.email,
-      name: u.displayName || (u.email ? u.email.split('@')[0] : 'Usuario'),
-      demo: false
-    };
   }
 
   // ======================================================
@@ -189,7 +206,7 @@
           <span id="authSwitchTxt">¿No tienes cuenta?</span>
           <button type="button" id="authSwitch" class="auth-link">Crea una aquí</button>
         </p>
-        <p class="auth-demo-note" id="authDemoNote" hidden>Modo demostración: aún no se ha conectado Firebase.</p>
+        <p class="auth-demo-note" id="authDemoNote" hidden>Modo demostración: aún no se ha conectado la API.</p>
       </div>`;
     document.body.appendChild(wrap);
     modalEl = wrap;
@@ -250,10 +267,30 @@
           }
         } else {
           await signIn(email, pass);
-          closeModal(); // éxito de login (en modo real, onAuthStateChange ya cierra; cerrar de nuevo es inofensivo)
+          closeModal();
         }
       } catch (ex) {
-        err.textContent = friendly(ex); err.hidden = false;
+        err.textContent = friendly(ex);
+        err.hidden = false;
+        // Cuenta sin confirmar: le ofrecemos reenviar el correo en lugar
+        // de dejarlo atascado sin saber qué hacer.
+        if (ex.data && ex.data.needsVerification) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'auth-link';
+          b.style.cssText = 'display:block;margin:8px auto 0';
+          b.textContent = 'Reenviar el correo de confirmación';
+          b.onclick = async () => {
+            b.disabled = true;
+            try {
+              await resendVerification(email);
+              err.hidden = true;
+              ok.textContent = 'Te reenviamos el correo. Revisa tu bandeja y la carpeta de spam.';
+              ok.hidden = false;
+            } catch (e2) { err.textContent = friendly(e2); }
+          };
+          err.appendChild(b);
+        }
       } finally {
         submit.disabled = false;
         submit.textContent = mode === 'login' ? 'Entrar' : 'Crear cuenta';
@@ -265,24 +302,10 @@
     return wrap;
   }
 
-  // Traduce los códigos de error de Firebase Auth a español.
-  // Firebase entrega e.code (p.ej. 'auth/wrong-password'); el mensaje viene
-  // siempre en inglés, así que nunca lo mostramos tal cual.
-  const AUTH_ERRORS = {
-    'auth/invalid-credential':      'Correo o contraseña incorrectos.',
-    'auth/wrong-password':          'Correo o contraseña incorrectos.',
-    'auth/user-not-found':          'No existe una cuenta con ese correo.',
-    'auth/email-already-in-use':    'Ese correo ya tiene una cuenta. Inicia sesión.',
-    'auth/weak-password':           'La contraseña debe tener al menos 6 caracteres.',
-    'auth/invalid-email':           'Escribe un correo válido.',
-    'auth/too-many-requests':       'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.',
-    'auth/network-request-failed':  'Sin conexión. Revisa tu internet e inténtalo de nuevo.',
-    'auth/user-disabled':           'Esta cuenta está deshabilitada. Contáctanos por WhatsApp.'
-  };
-
+  // La API responde con los mensajes ya redactados en español, así que se
+  // muestran tal cual. Esto solo cubre el caso de que no llegue ninguno.
   function friendly(e) {
-    if (e && e.code && AUTH_ERRORS[e.code]) return AUTH_ERRORS[e.code];
-    return 'Ocurrió un error. Inténtalo de nuevo.';
+    return (e && e.message) || 'Ocurrió un error. Inténtalo de nuevo.';
   }
 
   function openModal(mode) {
@@ -382,31 +405,13 @@
     else document.addEventListener('DOMContentLoaded', start);
   })();
 
-  // ---------- actualizar el perfil del usuario ----------
-  async function updateMeta(data) {
-    if (!REAL || !auth || !auth.currentUser) return;
-    try {
-      // Firebase solo permite displayName y photoURL en el perfil.
-      const patch = {};
-      if (data.full_name || data.name) patch.displayName = data.full_name || data.name;
-      if (data.avatar_url || data.photoURL) patch.photoURL = data.avatar_url || data.photoURL;
-      if (Object.keys(patch).length) await auth.currentUser.updateProfile(patch);
-    } catch (e) {
-      console.warn('[YESEMS_AUTH] updateMeta error:', e.message);
-    }
-  }
-
-  // ---------- sesión actual (con el token para llamar al backend) ----------
-  async function getSession() {
-    if (!REAL || !auth || !auth.currentUser) return null;
-    try {
-      const token = await auth.currentUser.getIdToken();
-      return { user: auth.currentUser, access_token: token };
-    } catch (e) { return null; }
-  }
 
   // ---------- export ----------
-  window.YESEMS_AUTH = { getUser, onChange, openModal, logout, isReal: () => REAL, updateMeta, getSession, recoverPassword };
+  window.YESEMS_AUTH = {
+    getUser, getToken, onChange, openModal, logout, refresh,
+    recoverPassword, resendVerification,
+    isReal: () => REAL,
+  };
 
   boot();
 })();
