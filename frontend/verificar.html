@@ -55,7 +55,12 @@
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || 'No se pudo confirmar tu correo.');
       // El servidor devuelve la sesión ya iniciada: el usuario entra directo.
-      try { localStorage.setItem('yesems_token', d.token); } catch (e) {}
+      // Se guarda también el perfil: así el panel y el curso abren al
+      // instante, sin depender de que el servidor esté despierto.
+      try {
+        localStorage.setItem('yesems_token', d.token);
+        if (d.user) localStorage.setItem('yesems_user', JSON.stringify(d.user));
+      } catch (e) {}
       pintar('✓', 'ok', '¡Listo, tu cuenta está activa!',
         'Ya puedes acceder a todo tu material de estudio.',
         '<a class="cuenta-btn" href="acredita-bach.html">Entrar al curso</a>');

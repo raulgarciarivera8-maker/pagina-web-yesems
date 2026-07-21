@@ -78,7 +78,10 @@
       if (!r.ok) throw new Error(d.error || 'No se pudo cambiar la contraseña.');
 
       // El servidor devuelve la sesión iniciada: no hay que volver a entrar.
-      try { localStorage.setItem('yesems_token', d.token); } catch (e2) {}
+      try {
+        localStorage.setItem('yesems_token', d.token);
+        if (d.user) localStorage.setItem('yesems_user', JSON.stringify(d.user));
+      } catch (e2) {}
       pintar('✓', 'ok', 'Contraseña actualizada',
         'Ya iniciamos tu sesión con la contraseña nueva.',
         '<a class="cuenta-btn" href="acredita-bach.html">Entrar al curso</a>');

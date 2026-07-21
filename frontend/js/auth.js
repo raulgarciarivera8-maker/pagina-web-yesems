@@ -35,12 +35,33 @@
   function getIntento() { return intentoActual; }
 
   // ---------- almacenamiento de la sesión ----------
-  function saveToken(t) {
+  //
+  // Se guarda el token Y el perfil. El perfil cacheado es lo que permite
+  // que la página abra al instante al recargar, sin esperar al servidor:
+  // en el plan gratuito de Render la primera petición tarda hasta 50 s, y
+  // hacer depender el arranque de ella dejaba la pantalla bloqueada.
+  //
+  // Es solo para la interfaz. Cada escritura viaja con el token y el
+  // servidor vuelve a comprobar los permisos, así que falsear este perfil
+  // a mano no da acceso a nada: enseñaría el panel y fallaría al guardar.
+  const USER_KEY = 'yesems_user';
+
+  function saveSession(t, u) {
     token = t;
-    try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    currentUser = u || null;
+    try {
+      if (t) localStorage.setItem(TOKEN_KEY, t);
+      else localStorage.removeItem(TOKEN_KEY);
+      if (u) localStorage.setItem(USER_KEY, JSON.stringify(u));
+      else localStorage.removeItem(USER_KEY);
+    } catch (e) {}
   }
+  function saveToken(t) { saveSession(t, t ? currentUser : null); }
   function loadToken() {
     try { return localStorage.getItem(TOKEN_KEY); } catch (e) { return null; }
+  }
+  function loadUser() {
+    try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch (e) { return null; }
   }
 
   // ---------- llamadas a la API ----------
@@ -112,8 +133,7 @@
   async function signIn(email, password) {
     if (REAL) {
       const d = await call('/api/auth/login', { method: 'POST', body: { email, password } });
-      saveToken(d.token);
-      currentUser = d.user;
+      saveSession(d.token, d.user);
       notify();
       return;
     }
@@ -135,8 +155,7 @@
 
   async function logout() {
     // La sesión es un JWT: basta con olvidarlo en este navegador.
-    saveToken(null);
-    currentUser = null;
+    saveSession(null, null);
     demoClear();
     notify();
     const menu = document.getElementById('acctMenu');
@@ -152,14 +171,14 @@
     if (!REAL || !token) return null;
     try {
       const d = await call('/api/auth/yo', { auth: true });
-      currentUser = d.user;
+      saveSession(token, d.user);
       booting = false;
       notify();
       return d.user;
     } catch (e) {
       console.warn('[auth] no se pudo recuperar el perfil:', e.status, e.message);
       // 401 = token vencido o cuenta borrada: se cierra la sesión.
-      if (e.status === 401) { saveToken(null); currentUser = null; }
+      if (e.status === 401) saveSession(null, null);
       // Cualquier otro fallo (servidor dormido, sin red) conserva el token,
       // pero HAY que avisar igualmente: antes se salía en silencio y la
       // pantalla se quedaba congelada pidiendo iniciar sesión, con una
@@ -197,16 +216,32 @@
   }
 
   async function boot() {
-    if (REAL) {
-      token = loadToken();
-      booting = !!token;
-      if (!token) { booting = false; notify(); return; }
-      await bootWithRetry();
-    } else {
+    if (!REAL) {
       currentUser = demoLoad();
       booting = false;
       notify();
+      return;
     }
+
+    token = loadToken();
+    if (!token) { booting = false; notify(); return; }
+
+    // Con sesión guardada, la página abre YA con el perfil cacheado. Nada
+    // de esperar al servidor para decidir qué enseñar.
+    const cacheado = loadUser();
+    if (cacheado) {
+      currentUser = cacheado;
+      booting = false;
+      notify();
+      // Y en segundo plano se confirma contra el servidor, por si el
+      // permiso cambió o la cuenta se deshabilitó.
+      bootWithRetry();
+      return;
+    }
+
+    // Sin perfil cacheado (sesión de una versión anterior) sí toca esperar.
+    booting = true;
+    await bootWithRetry();
   }
 
   // ======================================================
