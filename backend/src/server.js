@@ -9,6 +9,7 @@
 const express = require('express');
 const cors = require('cors');
 const { connect } = require('./db');
+const { verifySession } = require('./security');
 
 const app = express();
 app.set('trust proxy', 1);          // Render va detrás de un proxy: sin esto
@@ -51,9 +52,26 @@ app.options('*', cors(corsOptions));
 // Informa además QUÉ está configurado, nunca con qué valor: solo si la
 // variable existe. Sin esto, diagnosticar un ajuste que falta obliga a
 // adivinar a ciegas.
-app.get('/api/salud', (_req, res) => {
+app.get('/api/salud', (req, res) => {
   const admins = (process.env.ADMIN_EMAILS || '')
     .split(',').map((e) => e.trim()).filter(Boolean);
+
+  // Respuesta pública: lo mínimo para despertar el servicio y comprobar que
+  // responde. El detalle de configuración se reserva a administradores.
+  //
+  // Publicarlo era un problema real: "webhookSecret: false" anunciaba a
+  // cualquiera que el webhook de pagos aceptaba avisos sin firmar, y
+  // adminsHint dejaba ver el principio de los correos de administrador,
+  // que es justo por donde empieza quien quiere entrar a la fuerza.
+  const cabecera = req.get('authorization') || '';
+  const token = cabecera.startsWith('Bearer ') ? cabecera.slice(7) : null;
+  const datos = token ? verifySession(token) : null;
+  const esAdmin = !!(datos && admins
+    .map((e) => e.toLowerCase())
+    .includes(String(datos.email || '').toLowerCase()));
+
+  if (!esAdmin) return res.json({ ok: true, ts: Date.now() });
+
   res.json({
     ok: true,
     ts: Date.now(),

@@ -21,6 +21,8 @@ window.YESEMS_API_URL = 'https://pagina-web-yesems.onrender.com';
 (function () {
   if (!window.YESEMS_API_URL) return;
   try {
+    // Solo despierta el servicio. El detalle de configuracion ya no es
+    // publico: hay que ir con sesion de administrador para verlo.
     fetch(window.YESEMS_API_URL.replace(/\/$/, '') + '/api/salud', {
       method: 'GET',
       keepalive: true,
