@@ -8,6 +8,8 @@ Desktop.ini
 node_modules/
 
 # Secretos y configuración local
+backend/serviceAccount.json
+backend/scripts/pdf-urls.json
 .env
 .env.local
 backend/functions/.env
