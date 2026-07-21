@@ -14,6 +14,12 @@
 //     node scripts/seed-contenido.js --forzar
 // ============================================================
 require('dotenv').config();
+
+// Algunas redes domésticas no resuelven los registros SRV que usa
+// mongodb+srv://, y la conexión falla con querySrv ECONNREFUSED aunque
+// Atlas esté perfectamente accesible. Se fuerzan resolutores públicos.
+const dns = require('dns');
+try { dns.setServers(['8.8.8.8', '1.1.1.1', ...dns.getServers()]); } catch (e) {}
 const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');

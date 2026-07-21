@@ -98,6 +98,9 @@ router.post('/abrir', requireAuth, (req, res, next) => {
       return res.status(400).json({ error: 'Archivo no válido.' });
     }
 
+    // En archivos "raw" el public_id conserva la extensión
+    // (yesems/pdfs/guia.pdf), así que el formato va vacío: si se pasa
+    // aparte, Cloudinary busca una ruta que no existe y devuelve 404.
     const url = cloudinary.utils.private_download_url(publicId, '', {
       resource_type: 'raw',
       type: 'authenticated',
