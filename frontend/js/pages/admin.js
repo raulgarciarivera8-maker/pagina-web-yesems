@@ -773,7 +773,15 @@
   // =========================================================
   //  ARRANQUE
   // =========================================================
-  showGate('login');
+  // Con sesión guardada se arranca en "Cargando", no en "Inicia sesión":
+  // enseñar la puerta de acceso a quien ya entró es lo que hacía parecer
+  // que el login no funcionaba, cuando en realidad era una pantalla
+  // transitoria de medio segundo.
+  {
+    const A = window.YESEMS_AUTH;
+    const haySesion = A && A.getToken && A.getToken();
+    showGate(haySesion ? 'loading' : 'login');
+  }
   if (!window.YESEMS_AUTH) {
     gateBody.innerHTML = `<h1>Error</h1><p>No se pudo cargar la autenticación. Revisa que auth.js esté incluido.</p>`;
   } else {
