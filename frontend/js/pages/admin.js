@@ -73,10 +73,16 @@
     gate.hidden = false; bar.hidden = true; shell.hidden = true;
     const stamp = diagnostico();
     if (kind === 'loading') {
-      gateBody.innerHTML = `<div class="gate-spinner"></div><h1>Cargando…</h1><p>Verificando tu acceso.</p>${stamp}`;
+      gateBody.innerHTML = `<div class="gate-spinner"></div><h1>Cargando…</h1>
+        <p>Verificando tu acceso. Si el servidor llevaba rato inactivo,
+        puede tardar hasta un minuto en despertar.</p>${stamp}`;
       // En caso extremo, no dejes esta pantalla más de 3s.
       clearTimeout(showGate._lt);
-      showGate._lt = setTimeout(() => { if (!booted && gate && !gate.hidden) showGate('login'); }, 3000);
+      showGate._lt = setTimeout(() => {
+        const A = window.YESEMS_AUTH;
+        if (A && A.isBooting && A.isBooting()) return;  // sigue despertando el servidor
+        if (!booted && gate && !gate.hidden) showGate('login');
+      }, 3000);
     } else if (kind === 'login') {
       gateBody.innerHTML = `
         <h1>Acceso de administrador</h1>
@@ -752,7 +758,14 @@
         ? { email: user.email, isAdmin: user.isAdmin, emailVerified: user.emailVerified }
         : 'sin sesión');
 
-      if (!user) { if (!booted) showGate('login'); }
+      if (!user) {
+        // Con un token guardado y el perfil aún en camino, esto es una
+        // sesión abierta que todavía no ha respondido: pedir login sería
+        // engañoso y es justo lo que dejaba la pantalla atascada.
+        const A = window.YESEMS_AUTH;
+        const esperando = A.isBooting && A.isBooting();
+        if (!booted) showGate(esperando ? 'loading' : 'login');
+      }
       else if (!isAdmin(user)) showGate('denied', user);
       else bootPanel(user);
     });

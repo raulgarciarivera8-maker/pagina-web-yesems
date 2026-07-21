@@ -21,12 +21,16 @@
   const TOKEN_KEY = 'yesems_token';
   let currentUser = null;
   let token = null;
+  // Hay un token guardado y aún estamos recuperando el perfil. Sirve para no
+  // enseñar "inicia sesión" a alguien que ya tiene la sesión abierta.
+  let booting = false;
   const listeners = [];
 
   function notify() { listeners.forEach((cb) => { try { cb(currentUser); } catch (e) {} }); }
   function onChange(cb) { listeners.push(cb); if (currentUser !== undefined) cb(currentUser); }
   function getUser() { return currentUser; }
   function getToken() { return token; }
+  function isBooting() { return booting; }
 
   // ---------- almacenamiento de la sesión ----------
   function saveToken(t) {
@@ -133,24 +137,52 @@
     try {
       const d = await call('/api/auth/yo', { auth: true });
       currentUser = d.user;
+      booting = false;
       notify();
       return d.user;
     } catch (e) {
-      // 401 = token vencido o cuenta borrada: se cierra la sesión.
-      // Otros errores (servidor dormido) no deben desloguear al usuario.
       console.warn('[auth] no se pudo recuperar el perfil:', e.status, e.message);
-      if (e.status === 401) { saveToken(null); currentUser = null; notify(); }
+      // 401 = token vencido o cuenta borrada: se cierra la sesión.
+      if (e.status === 401) { saveToken(null); currentUser = null; }
+      // Cualquier otro fallo (servidor dormido, sin red) conserva el token,
+      // pero HAY que avisar igualmente: antes se salía en silencio y la
+      // pantalla se quedaba congelada pidiendo iniciar sesión, con una
+      // sesión perfectamente válida y sin ningún reintento.
+      booting = false;
+      notify();
       return null;
     }
+  }
+
+  // Reintenta mientras el servicio despierta. Render tarda hasta ~50 s en
+  // arrancar en el plan gratuito, mucho más que el primer intento.
+  async function bootWithRetry() {
+    for (let intento = 1; intento <= 4; intento++) {
+      const u = await refresh();
+      if (u) return u;
+      // Si el token dejó de ser válido, no tiene sentido reintentar.
+      if (!token) return null;
+      // Solo reintentamos cuando el fallo pudo ser por el servidor dormido.
+      const err = window.__YESEMS_LAST_AUTH_ERROR || '';
+      if (!/sin conexión|^0 |50\d /.test(err)) return null;
+      booting = true;
+      notify();
+      await new Promise((r) => setTimeout(r, intento * 3000));
+    }
+    booting = false;
+    notify();
+    return null;
   }
 
   async function boot() {
     if (REAL) {
       token = loadToken();
-      if (!token) { notify(); return; }
-      await refresh();
+      booting = !!token;
+      if (!token) { booting = false; notify(); return; }
+      await bootWithRetry();
     } else {
       currentUser = demoLoad();
+      booting = false;
       notify();
     }
   }
@@ -419,7 +451,7 @@
 
   // ---------- export ----------
   window.YESEMS_AUTH = {
-    getUser, getToken, onChange, openModal, logout, refresh,
+    getUser, getToken, isBooting, onChange, openModal, logout, refresh,
     recoverPassword, resendVerification,
     isReal: () => REAL,
   };
