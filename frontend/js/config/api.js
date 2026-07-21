@@ -8,7 +8,7 @@
 //  Mientras esté vacía, el sitio funciona en MODO DEMO: se ve el
 //  contenido de fábrica y el login no es real.
 // ============================================================
-window.YESEMS_API_URL = '';
+window.YESEMS_API_URL = 'https://pagina-web-yesems.onrender.com';
 
 // ------------------------------------------------------------
 //  Aviso sobre el plan gratuito de Render
