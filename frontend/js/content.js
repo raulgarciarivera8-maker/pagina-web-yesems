@@ -154,6 +154,7 @@
     fd.append('timestamp', f.timestamp);
     fd.append('signature', f.signature);
     fd.append('folder', f.folder);
+    if (f.type) fd.append('type', f.type);   // authenticated: sin URL pública
 
     const ru = await fetch(f.uploadUrl, { method: 'POST', body: fd });
     if (!ru.ok) {
@@ -164,8 +165,31 @@
     return up.secure_url;
   }
 
+  // Pide un enlace temporal para abrir un PDF. El archivo no tiene URL
+  // pública: el servidor comprueba la suscripción y firma un enlace que
+  // caduca a los 15 minutos.
+  async function abrirPDF(id) {
+    if (!REAL) throw new Error('La API no está configurada.');
+    const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
+    if (!token) throw new Error('Inicia sesión para abrir el material.');
+
+    const r = await fetch(API + '/api/archivos/abrir', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ id }),
+      signal: conCorte(20000),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const err = new Error(j.error || 'No se pudo abrir el archivo.');
+      err.status = r.status;
+      throw err;
+    }
+    return j.url;
+  }
+
   const api = {
-    load, save, uploadPDF,
+    load, save, uploadPDF, abrirPDF,
     data: null,
     source: null,
     conAcceso: false,

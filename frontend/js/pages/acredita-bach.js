@@ -2,6 +2,43 @@
 // Reuses window.modulesData + window.topicPDFs + window.topicQuizzes.
 
 (function () {
+  // ---------- PDFs protegidos ----------
+  // Los archivos ya no tienen dirección pública: se pide al servidor un
+  // enlace firmado y temporal, que solo entrega a quien tiene suscripción.
+  // Antes el href apuntaba a /assets/pdfs/nombre.pdf, adivinable por
+  // cualquiera aunque el enlace no se mostrara.
+  function escAttrPdf(v) {
+    return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  document.addEventListener('click', async function (e) {
+    const a = e.target.closest && e.target.closest('.pdf-btn[data-pdf]');
+    if (!a) return;
+    e.preventDefault();
+    if (a.dataset.cargando === '1') return;
+
+    const original = a.innerHTML;
+    a.dataset.cargando = '1';
+    a.style.opacity = '0.65';
+    try {
+      const url = await window.YESEMS_CONTENT.abrirPDF(a.dataset.pdf);
+      window.open(url, '_blank', 'noopener');
+    } catch (err) {
+      const aviso = document.createElement('span');
+      aviso.style.cssText = 'display:block;margin-top:6px;font-size:13px;color:#b03030';
+      aviso.textContent = err && err.status === 403
+        ? 'Necesitas una suscripción activa para abrir este material.'
+        : (err.message || 'No se pudo abrir el archivo.');
+      a.parentNode.appendChild(aviso);
+      setTimeout(function () { aviso.remove(); }, 6000);
+    } finally {
+      a.dataset.cargando = '0';
+      a.style.opacity = '';
+      a.innerHTML = original;
+    }
+  });
+
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
@@ -73,6 +110,17 @@
   const panel = document.getElementById('areaPanel');
 
   function renderTopic(t) {
+    // Sin suscripción, el servidor manda solo el título del tema. Se avisa en
+    // lugar de pintar "undefined", que es lo que saldría al faltar los campos.
+    if (t.bloqueado || (!t.def && !t.concepts && !t.example)) {
+      return `
+        <div class="topic-locked" style="padding:16px 18px;background:#f7f9fc;border:1px dashed #d8dfe8;border-radius:12px;color:#64748b;line-height:1.7">
+          <strong style="color:#1a1a2e">Contenido de la suscripción</strong><br>
+          La teoría, el material en PDF y el examen de este tema se desbloquean
+          al activar tu acceso.
+        </div>`;
+    }
+
     let body = `<div class="block def"><span class="lbl">Definición</span>${t.def}</div>`;
     if (t.concepts && t.concepts.length) {
       body += `<div class="concepts"><span class="lbl">Conceptos clave</span><ul>` +
@@ -86,7 +134,7 @@
       const fileName = pdfPath.split('/').pop();
       body += `
         <div class="topic-pdf">
-          <a class="pdf-btn" href="${pdfPath}" download="${fileName}" target="_blank" rel="noopener">
+          <a class="pdf-btn" href="#" data-pdf="${escAttrPdf(pdfPath)}" data-nombre="${escAttrPdf(fileName)}">
             <span class="pdf-ico">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
@@ -311,7 +359,7 @@
     const fileName = data.guide.split('/').pop();
     return `
       <div class="area-guide">
-        <a class="pdf-btn" href="${data.guide}" download="${fileName}" target="_blank" rel="noopener">
+        <a class="pdf-btn" href="#" data-pdf="${escAttrPdf(data.guide)}" data-nombre="${escAttrPdf(fileName)}">
           <span class="pdf-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
