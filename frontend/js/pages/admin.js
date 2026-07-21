@@ -47,9 +47,31 @@
   // =========================================================
   //  GATE (acceso)
   // =========================================================
+  // Resumen del estado real, visible en la propia pantalla. Sin esto, cuando
+  // la puerta rechaza el acceso no hay forma de saber por qué sin abrir las
+  // herramientas de desarrollo.
+  function diagnostico() {
+    const A = window.YESEMS_AUTH;
+    const partes = [
+      'API: ' + (window.YESEMS_API_URL ? 'configurada' : 'FALTA'),
+      'sesión: ' + (A && A.getToken && A.getToken() ? 'sí' : 'no'),
+    ];
+    const u = A && A.getUser && A.getUser();
+    if (u) {
+      partes.push('correo: ' + esc(u.email));
+      partes.push('verificado: ' + (u.emailVerified ? 'sí' : 'NO'));
+      partes.push('admin: ' + (u.isAdmin ? 'sí' : 'NO'));
+    }
+    if (window.__YESEMS_LAST_AUTH_ERROR) {
+      partes.push('último error: ' + esc(window.__YESEMS_LAST_AUTH_ERROR));
+    }
+    return `<p style="margin-top:14px;font-size:11px;color:#9aa3b2;line-height:1.7">
+      ${partes.join(' · ')}<br>Versión ${ADMIN_VERSION}</p>`;
+  }
+
   function showGate(kind, user) {
     gate.hidden = false; bar.hidden = true; shell.hidden = true;
-    const stamp = `<p style="margin-top:14px;font-size:11px;color:#9aa3b2">Versión ${ADMIN_VERSION}</p>`;
+    const stamp = diagnostico();
     if (kind === 'loading') {
       gateBody.innerHTML = `<div class="gate-spinner"></div><h1>Cargando…</h1><p>Verificando tu acceso.</p>${stamp}`;
       // En caso extremo, no dejes esta pantalla más de 3s.
@@ -72,7 +94,7 @@
         <div class="gate-actions">
           <button class="gate-btn alt" id="gateLogout" type="button">Cambiar de cuenta</button>
           <a class="gate-btn alt" href="index.html">Volver al sitio</a>
-        </div>`;
+        </div>${stamp}`;
       $('#gateLogout').addEventListener('click', () => window.YESEMS_AUTH.logout());
     }
   }

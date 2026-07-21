@@ -53,6 +53,7 @@
       // petición puede tardar o fallar mientras despierta.
       const err = new Error('No se pudo conectar con el servidor. Inténtalo de nuevo en unos segundos.');
       err.status = 0;
+      window.__YESEMS_LAST_AUTH_ERROR = 'sin conexión con la API';
       throw err;
     }
 
@@ -61,6 +62,8 @@
       const err = new Error(data.error || 'Ocurrió un error. Inténtalo de nuevo.');
       err.status = r.status;
       err.data = data;
+      // Se guarda para poder mostrarlo en pantalla si algo falla después.
+      window.__YESEMS_LAST_AUTH_ERROR = r.status + ' ' + err.message;
       throw err;
     }
     return data;
