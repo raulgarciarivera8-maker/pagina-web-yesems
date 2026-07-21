@@ -1,3 +1,15 @@
+/* ============================================================
+   El atributo hidden debe ganar SIEMPRE.
+   ------------------------------------------------------------
+   Sin esto, cualquier regla con clase (.admin-gate { display:grid })
+   o un estilo en línea (display:flex) pisan al hidden del HTML y el
+   elemento sigue viéndose. Fue la causa de que la pantalla de acceso
+   tapara el panel indefinidamente: hideGate() ponía hidden=true, el
+   panel se montaba correctamente detrás, y la puerta seguía encima
+   ocupando toda la ventana.
+   ============================================================ */
+[hidden] { display: none !important; }
+
 /* ========== MEJORAS DE UI  · YES EMS ADMIN ========== */
 :root {
   --admin-primary: #009EE3;

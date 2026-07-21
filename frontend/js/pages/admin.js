@@ -90,6 +90,7 @@
   // revalida el permiso en cada guardado.
   function mostrarAviso(texto, textoBoton, alPulsar) {
     window.__ADMIN_JS_OK = true;
+    if (gateBody) gateBody.dataset.listo = '1';   // el vigilante ya no hace falta
     const caja = $('#adminAviso');
     const txt  = $('#adminAvisoTexto');
     const btn  = $('#adminAvisoBtn');
