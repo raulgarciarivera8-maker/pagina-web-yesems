@@ -108,13 +108,18 @@ router.post('/registro', limiteEstricto, async (req, res, next) => {
     }
 
     const token = await issueToken(user._id, 'verify', 24 * 60);
+
+    // Si el correo no sale, la cuenta queda creada pero el usuario no puede
+    // confirmarla nunca. Antes esto se tragaba en silencio y la persona se
+    // quedaba esperando un correo que no iba a llegar, sin saber por qué.
+    let emailSent = true;
     try {
       await enviarVerificacion(email, name, token);
     } catch {
-      // La cuenta ya está creada; puede pedir el reenvío desde la web.
+      emailSent = false;
     }
 
-    res.status(201).json({ ok: true, needsVerification: true });
+    res.status(201).json({ ok: true, needsVerification: true, emailSent });
   } catch (err) { next(err); }
 });
 
@@ -174,12 +179,13 @@ router.post('/reenviar', limiteCorreo, async (req, res, next) => {
   try {
     const email = limpiarEmail(req.body.email);
     const user = await collections.users().findOne({ email });
+    let emailSent = true;
     if (user && !user.emailVerified) {
       const token = await issueToken(user._id, 'verify', 24 * 60);
-      try { await enviarVerificacion(email, user.name, token); } catch {}
+      try { await enviarVerificacion(email, user.name, token); } catch { emailSent = false; }
     }
-    // Respuesta idéntica exista o no la cuenta.
-    res.json({ ok: true });
+    // Respuesta idéntica exista o no la cuenta, salvo el aviso de envío.
+    res.json({ ok: true, emailSent });
   } catch (err) { next(err); }
 });
 

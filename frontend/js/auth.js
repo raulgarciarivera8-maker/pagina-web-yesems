@@ -77,9 +77,9 @@
   // ======================================================
   async function signUp(email, password, name) {
     if (REAL) {
-      await call('/api/auth/registro', { method: 'POST', body: { email, password, name } });
+      const d = await call('/api/auth/registro', { method: 'POST', body: { email, password, name } });
       // La cuenta queda creada pero inactiva: hay que confirmar el correo.
-      return { needsConfirm: true };
+      return { needsConfirm: true, emailSent: d.emailSent !== false };
     }
     const u = { email, name: name || email.split('@')[0], demo: true };
     demoSave(u); currentUser = u; notify();
@@ -259,8 +259,15 @@
         if (mode === 'signup') {
           const r = await signUp(email, pass, name);
           if (r.needsConfirm) {
-            ok.textContent = 'Te enviamos un correo para confirmar tu cuenta. Revísalo y luego inicia sesión.';
-            ok.hidden = false;
+            if (r.emailSent) {
+              ok.textContent = 'Te enviamos un correo para confirmar tu cuenta. Revísalo (mira también en spam) y luego inicia sesión.';
+              ok.hidden = false;
+            } else {
+              // El servicio de correo falló: decirlo es mejor que dejar a la
+              // persona esperando un mensaje que nunca va a llegar.
+              err.textContent = 'Tu cuenta se creó, pero no pudimos enviarte el correo de confirmación. Escríbenos por WhatsApp para activarla.';
+              err.hidden = false;
+            }
             setMode('login');
           } else {
             closeModal(); // demo signup o proyecto sin confirmación
