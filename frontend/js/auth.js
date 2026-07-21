@@ -135,6 +135,7 @@
     } catch (e) {
       // 401 = token vencido o cuenta borrada: se cierra la sesión.
       // Otros errores (servidor dormido) no deben desloguear al usuario.
+      console.warn('[auth] no se pudo recuperar el perfil:', e.status, e.message);
       if (e.status === 401) { saveToken(null); currentUser = null; notify(); }
       return null;
     }

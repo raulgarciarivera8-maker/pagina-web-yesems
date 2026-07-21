@@ -59,7 +59,13 @@ app.get('/api/salud', (_req, res) => {
       webhookSecret: !!process.env.MERCADO_PAGO_WEBHOOK_SECRET,
       siteUrl:    process.env.SITE_URL || null,    // pública: ya se ve en las cabeceras CORS
       apiUrl:     !!process.env.API_URL,
-      admins:     admins.length,                   // cuántos, no quiénes
+      admins:     admins.length,
+      // Enmascarados: suficiente para reconocer el propio correo y
+      // detectar una errata, sin publicar las direcciones completas.
+      adminsHint: admins.map((e) => {
+        const [u, d] = e.split('@');
+        return (u.length <= 3 ? u[0] + '**' : u.slice(0, 3) + '***') + '@' + (d || '');
+      }),
     },
   });
 });

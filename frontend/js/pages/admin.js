@@ -724,6 +724,12 @@
   } else {
     window.YESEMS_AUTH.onChange((user) => {
       currentUser = user;
+      // Diagnóstico en consola: antes, cuando la puerta rebotaba no había
+      // forma de saber si era falta de sesión o falta de permiso.
+      console.log('[admin] estado de acceso:', user
+        ? { email: user.email, isAdmin: user.isAdmin, emailVerified: user.emailVerified }
+        : 'sin sesión');
+
       if (!user) { if (!booted) showGate('login'); }
       else if (!isAdmin(user)) showGate('denied', user);
       else bootPanel(user);
