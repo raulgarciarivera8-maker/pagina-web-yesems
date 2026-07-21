@@ -48,10 +48,18 @@
     if (doc.pdfs)    window.topicPDFs = doc.pdfs;
   }
 
+  // Igual que en auth.js: sin tiempo límite, una petición interceptada deja
+  // la página cargando para siempre.
+  function conCorte(ms) {
+    const c = new AbortController();
+    setTimeout(() => c.abort(), ms);
+    return c.signal;
+  }
+
   async function fetchDoc() {
     if (!REAL) return null;
     try {
-      const r = await fetch(API + '/api/contenido');
+      const r = await fetch(API + '/api/contenido', { signal: conCorte(20000) });
       if (!r.ok) return null;
       const j = await r.json();
       return j.data || null;

@@ -49,16 +49,30 @@
     if (body) headers['Content-Type'] = 'application/json';
     if (withAuth && token) headers.Authorization = 'Bearer ' + token;
 
+    // fetch no tiene tiempo límite propio: si algo intercepta la petición
+    // (un antivirus, una extensión, un proxy) se queda colgada para siempre
+    // y la pantalla se queda cargando sin explicar nada. Con AbortController
+    // el fallo se hace visible en 20 segundos.
+    const ctrl = new AbortController();
+    const corte = setTimeout(() => ctrl.abort(), 20000);
+
     let r;
     try {
-      r = await fetch(API + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+      r = await fetch(API + path, {
+        method, headers,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: ctrl.signal,
+      });
     } catch (e) {
-      // Render duerme el servicio en el plan gratuito: la primera
-      // petición puede tardar o fallar mientras despierta.
-      const err = new Error('No se pudo conectar con el servidor. Inténtalo de nuevo en unos segundos.');
+      const expiro = e.name === 'AbortError';
+      const err = new Error(expiro
+        ? 'El servidor no respondió a tiempo. Revisa tu conexión, o si un antivirus o una extensión del navegador están bloqueando la página.'
+        : 'No se pudo conectar con el servidor. Inténtalo de nuevo en unos segundos.');
       err.status = 0;
-      window.__YESEMS_LAST_AUTH_ERROR = 'sin conexión con la API';
+      window.__YESEMS_LAST_AUTH_ERROR = expiro ? 'la petición expiró (20s)' : 'sin conexión con la API';
       throw err;
+    } finally {
+      clearTimeout(corte);
     }
 
     const data = await r.json().catch(() => ({}));
