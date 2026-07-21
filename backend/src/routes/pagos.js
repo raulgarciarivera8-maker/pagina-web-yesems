@@ -20,6 +20,7 @@ const MP_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
 const SITE = (process.env.SITE_URL || 'https://pagina-web-yesems.vercel.app').replace(/\/$/, '');
 const API = (process.env.API_URL || '').replace(/\/$/, '');
 
+// Valores de respaldo, por si aún no se ha publicado contenido.
 const PLANES = {
   'acredita-bach': {
     title: 'Acredita-Bach · YES EMS',
@@ -27,6 +28,35 @@ const PLANES = {
     price: 50,
   },
 };
+
+// El precio SIEMPRE se lee de la base de datos, nunca de lo que mande el
+// navegador: si el importe viniera en la petición, cualquiera podría
+// editarlo y pagar un peso.
+//
+// Antes estaba escrito a mano aquí, mientras que el panel editaba otro
+// campo distinto: la página anunciaba un precio y Mercado Pago cobraba otro.
+async function precioDelPlan(planKey) {
+  const respaldo = (PLANES[planKey] || PLANES['acredita-bach']).price;
+  try {
+    const doc = await collections.content().findOne({ id: 'acredita-bach' });
+    const sub = doc && doc.data && doc.data.subscription;
+    if (!sub) return respaldo;
+
+    // El panel guarda el precio como texto ("150", "1,200", "$150").
+    const bruto = String(sub.price == null ? '' : sub.price).replace(/[^0-9.]/g, '');
+    const num = parseFloat(bruto);
+
+    // Un precio inválido o cero cobraría de menos sin avisar: mejor el respaldo.
+    if (!isFinite(num) || num <= 0) {
+      console.warn(`Precio no válido en el contenido ("${sub.price}"); se usa ${respaldo}`);
+      return respaldo;
+    }
+    return num;
+  } catch (e) {
+    console.error('No se pudo leer el precio del contenido:', e.message);
+    return respaldo;
+  }
+}
 
 // ---------- crear preferencia ----------
 router.post('/preferencia', requireAuth, async (req, res, next) => {
@@ -37,6 +67,7 @@ router.post('/preferencia', requireAuth, async (req, res, next) => {
 
     const planKey = PLANES[req.body && req.body.plan] ? req.body.plan : 'acredita-bach';
     const plan = PLANES[planKey];
+    const precio = await precioDelPlan(planKey);
 
     // El comprador sale de la sesión, nunca del cuerpo de la petición:
     // así nadie puede generar un pago a nombre de otra persona.
@@ -49,7 +80,7 @@ router.post('/preferencia', requireAuth, async (req, res, next) => {
         description: plan.description,
         quantity: 1,
         currency_id: 'MXN',
-        unit_price: plan.price,
+        unit_price: precio,
       }],
       payer: { email },
       back_urls: {

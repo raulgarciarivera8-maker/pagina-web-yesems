@@ -497,6 +497,24 @@
           <div class="field"><label>Periodo</label><input class="inp" data-path="subscription.period" value="${escAttr(s.period)}" placeholder="MXN / mensual"></div>
         </div>
         <p class="card-sub" style="margin:6px 0 0">Vista previa: <strong>${esc(s.currency)}${esc(s.price)}</strong> <span style="color:var(--ink-mute)">${esc((s.period || '').replace(/<br>/g, ' '))}</span></p>
+        ${(() => {
+          // Se muestra el importe exacto que llegará a Mercado Pago, calculado
+          // igual que en el servidor. Antes el panel editaba este campo pero el
+          // cobro usaba una cantidad fija escrita en el código, así que la
+          // página anunciaba un precio y el checkout mostraba otro.
+          const n = parseFloat(String(s.price == null ? '' : s.price).replace(/[^0-9.]/g, ''));
+          const ok = isFinite(n) && n > 0;
+          return `<p class="card-sub" style="margin:10px 0 0;padding:10px 12px;border-radius:8px;
+            background:${ok ? '#e9f7ee' : '#fdeaea'};color:${ok ? '#22683c' : '#a33'}">
+            ${ok
+              ? `Se cobrará <strong>$${n} MXN</strong> en Mercado Pago. El importe se toma de este campo al guardar.`
+              : `El monto no es un número válido, así que Mercado Pago cobraría el importe de respaldo. Escribe solo cifras, por ejemplo <strong>150</strong>.`}
+          </p>`;
+        })()}
+        <p class="card-sub" style="margin:8px 0 0;color:var(--ink-mute)">
+          Recuerda pulsar <strong>Guardar cambios</strong>: el precio nuevo solo se cobra
+          después de publicarlo.
+        </p>
       </div>
 
       <div class="card">

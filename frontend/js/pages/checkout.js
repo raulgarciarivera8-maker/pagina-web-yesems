@@ -71,11 +71,29 @@
   }
 
   // ─── PRECIO ───────────────────────────────────
+  // Se toma del contenido publicado, que es lo que edita el panel y lo mismo
+  // que lee el servidor al cobrar. Antes estaba escrito a mano aquí, así que
+  // la página podía anunciar un precio y Mercado Pago cobrar otro distinto.
+  function precioPublicado() {
+    var s = window.YESEMS_CONTENT
+         && window.YESEMS_CONTENT.data
+         && window.YESEMS_CONTENT.data.subscription;
+    if (!s || s.price == null) return null;
+    var n = parseFloat(String(s.price).replace(/[^0-9.]/g, ''));
+    return (isFinite(n) && n > 0) ? { monto: n, sub: s } : null;
+  }
+
   function updatePriceDisplay() {
+    var p = precioPublicado();
+    var monto = p ? p.monto : CONFIG.price;
     var price = document.querySelector('.sub-price .amount');
-    if (price) price.textContent = '$' + CONFIG.price;
+    if (price) price.textContent = '$' + monto;
     var period = document.querySelector('.sub-price .period');
-    if (period) period.innerHTML = CONFIG.currency + '<br>' + CONFIG.period;
+    if (period) {
+      period.innerHTML = (p && p.sub.period)
+        ? p.sub.period
+        : CONFIG.currency + '<br>' + CONFIG.period;
+    }
   }
 
   // ─── VERIFICAR ACCESO CONTRA LA API ───────────
@@ -200,6 +218,10 @@
   // ─── INICIO ───────────────────────────────────
   async function init() {
     updatePriceDisplay();
+    // El contenido llega despues: se vuelve a pintar con el precio publicado.
+    if (window.YESEMS_CONTENT && window.YESEMS_CONTENT.ready) {
+      window.YESEMS_CONTENT.ready.then(updatePriceDisplay).catch(function(){});
+    }
 
     // Optimista: si la caché dice que hay acceso, abrimos ya para evitar
     // el parpadeo, pero igual verificamos contra el backend enseguida.
