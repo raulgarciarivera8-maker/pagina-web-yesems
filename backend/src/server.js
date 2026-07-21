@@ -16,8 +16,10 @@ app.set('trust proxy', 1);          // Render va detrás de un proxy: sin esto
 
 // El webhook de Mercado Pago necesita el cuerpo crudo para validar la firma,
 // así que se guarda una copia antes de convertirlo a JSON.
+// El documento de contenido lleva el temario completo, los exámenes y los
+// enlaces a PDFs: con 1 MB se queda corto en cuanto el curso crece.
 app.use(express.json({
-  limit: '1mb',
+  limit: '25mb',
   verify: (req, _res, buf) => { req.rawBody = buf; },
 }));
 
@@ -28,15 +30,20 @@ const permitidos = [
   'http://127.0.0.1:3000',
 ].filter(Boolean).map((o) => o.replace(/\/$/, ''));
 
-app.use(cors({
+const corsOptions = {
   origin(origin, cb) {
     // Sin cabecera Origin son peticiones servidor-a-servidor (el webhook).
     if (!origin || permitidos.includes(origin.replace(/\/$/, ''))) return cb(null, true);
     cb(new Error('Origen no permitido'));
   },
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+};
+
+app.use(cors(corsOptions));
+// Preflight explícito: algunos proxies y antivirus no dejan pasar el OPTIONS
+// implícito del middleware, y la petición se queda colgada sin error.
+app.options('*', cors(corsOptions));
 
 // Render apaga el servicio tras 15 min sin tráfico. Este endpoint sirve
 // para despertarlo y para comprobar que sigue vivo.
@@ -88,6 +95,11 @@ app.use((err, _req, res, _next) => {
   }
   res.status(500).json({ error: 'Error interno del servidor' });
 });
+
+// Un fallo suelto no debe tumbar el servicio entero: en Render eso significa
+// que la siguiente petición del usuario espera otro arranque en frío.
+process.on('unhandledRejection', (e) => console.error('Promesa sin capturar:', e));
+process.on('uncaughtException',  (e) => console.error('Excepción no capturada:', e));
 
 const PORT = process.env.PORT || 3001;
 
