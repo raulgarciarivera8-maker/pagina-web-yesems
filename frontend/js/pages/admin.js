@@ -785,6 +785,14 @@
   if (!window.YESEMS_AUTH) {
     gateBody.innerHTML = `<h1>Error</h1><p>No se pudo cargar la autenticación. Revisa que auth.js esté incluido.</p>`;
   } else {
+    // El diagnóstico se repinta cada segundo mientras la puerta esté visible:
+    // así refleja el estado real en cada momento en vez de quedarse con una
+    // foto del arranque, que es lo que despistaba al leer las capturas.
+    setInterval(() => {
+      const p = gate && !gate.hidden && gateBody && gateBody.querySelector('p:last-of-type');
+      if (p) p.outerHTML = diagnostico();
+    }, 1000);
+
     window.YESEMS_AUTH.onChange((user) => {
       currentUser = user;
       // Diagnóstico en consola: antes, cuando la puerta rebotaba no había

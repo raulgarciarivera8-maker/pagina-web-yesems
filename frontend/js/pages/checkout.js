@@ -81,11 +81,19 @@
   // ─── VERIFICAR ACCESO CONTRA LA API ───────────
   // El acceso lo marca SOLO el webhook de pago, desde el servidor. El
   // navegador nunca puede otorgárselo a sí mismo.
-  async function checkAccess() {
+  // Evita el bucle: refresh() dispara onChange, y onChange llamaba aquí de
+  // nuevo, que volvía a llamar a refresh(). Un usuario con sesión iniciada
+  // dejaba la página pidiendo el perfil sin parar.
+  let verificando = false;
+
+  async function checkAccess(user) {
     const auth = window.YESEMS_AUTH;
-    if (!auth || !auth.refresh) return false;
+    if (!auth) return false;
+    if (verificando) return false;
+    verificando = true;
     try {
-      const user = await auth.refresh();
+      // Si onChange ya nos entregó el perfil, no hace falta volver a pedirlo.
+      if (!user && auth.refresh) user = await auth.refresh();
       if (!user || user.accessGranted !== true) return false;
       if (user.expiresAt && new Date(user.expiresAt) <= new Date()) return false;
       saveAccess(user.email, user.expiresAt);
@@ -94,6 +102,8 @@
     } catch (e) {
       console.warn('[checkout] no se pudo verificar el acceso:', e.message);
       return false;
+    } finally {
+      verificando = false;
     }
   }
 
@@ -202,7 +212,9 @@
     if (window.YESEMS_AUTH) {
       window.YESEMS_AUTH.onChange(async function(user) {
         if (user) {
-          await checkAccess();
+          // Se le pasa el perfil recibido: pedirlo otra vez era lo que
+          // realimentaba el bucle.
+          await checkAccess(user);
         } else {
           clearAccess();
         }
