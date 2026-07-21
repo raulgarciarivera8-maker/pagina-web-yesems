@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// ============================================================
+//  REGLAS DE FIRESTORE  ·  YES EMS
+//  ------------------------------------------------------------
+//  Equivalen a las políticas RLS que teníamos en Postgres.
+//  Estas reglas son el ÚNICO candado real: el código del
+//  navegador se puede modificar, esto no.
+//
+//  Al cambiar la lista de administradores, actualiza también
+//  storage.rules y frontend/js/config/firebase.js.
+// ============================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function esAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+             'raulyeyo12@gmail.com',
+             'raulgarciarivera08@gmail.com'
+           ];
+    }
+
+    // Contenido del curso: lo lee cualquiera, lo edita solo el admin.
+    match /site_content/{docId} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+
+    // Accesos pagados: cada quien ve SOLO el suyo.
+    // Nadie puede escribir desde el navegador — únicamente el webhook
+    // de pagos, que usa el SDK de servidor y se salta estas reglas.
+    match /user_access/{email} {
+      allow read: if request.auth != null
+                  && request.auth.token.email.lower() == email;
+      allow write: if false;
+    }
+
+    // Todo lo demás queda cerrado.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

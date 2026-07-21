@@ -4,9 +4,14 @@ Desktop.ini
 *.log
 .DS_Store
 
-# Entorno
+# Dependencias
+node_modules/
+
+# Secretos y configuración local
 .env
 .env.local
+backend/functions/.env
+.firebase/
 
 # Scripts temporales
 *.py
@@ -18,6 +23,3 @@ Desktop.ini
 !**/*.js
 !**/*.json
 !.gitignore
-
-# Supabase tokens
-.sbp_token
