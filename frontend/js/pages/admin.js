@@ -71,6 +71,13 @@
       ${partes.join(' · ')}<br>Versión ${ADMIN_VERSION}</p>`;
   }
 
+  // Una sola función decide qué se ve, a partir del usuario actual y nada más.
+  //
+  // La versión anterior repartía esa decisión entre showGate, hideGate, una
+  // bandera "booted" y un temporizador de 3 segundos que podía contradecir a
+  // los otros tres. Bastaba con que uno se desincronizara para dejar la
+  // pantalla en "Cargando" con la sesión perfectamente válida, que es
+  // justo lo que pasaba. Sin estados intermedios, eso ya no puede ocurrir.
   function showGate(kind, user) {
     gate.hidden = false; bar.hidden = true; shell.hidden = true;
     const stamp = diagnostico();
@@ -78,13 +85,6 @@
       gateBody.innerHTML = `<div class="gate-spinner"></div><h1>Cargando…</h1>
         <p>Verificando tu acceso. Si el servidor llevaba rato inactivo,
         puede tardar hasta un minuto en despertar.</p>${stamp}`;
-      // En caso extremo, no dejes esta pantalla más de 3s.
-      clearTimeout(showGate._lt);
-      showGate._lt = setTimeout(() => {
-        const A = window.YESEMS_AUTH;
-        if (A && A.isBooting && A.isBooting()) return;  // sigue despertando el servidor
-        if (!booted && gate && !gate.hidden) showGate('login');
-      }, 3000);
     } else if (kind === 'login') {
       gateBody.innerHTML = `
         <h1>Acceso de administrador</h1>
@@ -94,7 +94,7 @@
           <a class="gate-btn alt" href="index.html">Volver al sitio</a>
         </div>${stamp}`;
       $('#gateLogin').addEventListener('click', () => window.YESEMS_AUTH.openModal('login'));
-    } else if (kind === 'denied') {
+    } else {
       gateBody.innerHTML = `
         <div class="gate-icon-bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg></div>
         <h1>Sin permiso</h1>
@@ -773,52 +773,44 @@
   // =========================================================
   //  ARRANQUE
   // =========================================================
-  // Con sesión guardada se arranca en "Cargando", no en "Inicia sesión":
-  // enseñar la puerta de acceso a quien ya entró es lo que hacía parecer
-  // que el login no funcionaba, cuando en realidad era una pantalla
-  // transitoria de medio segundo.
-  {
-    const A = window.YESEMS_AUTH;
-    const haySesion = A && A.getToken && A.getToken();
-    showGate(haySesion ? 'loading' : 'login');
-  }
   if (!window.YESEMS_AUTH) {
     gateBody.innerHTML = `<h1>Error</h1><p>No se pudo cargar la autenticación. Revisa que auth.js esté incluido.</p>`;
   } else {
-    // El diagnóstico se repinta cada segundo mientras la puerta esté visible:
-    // así refleja el estado real en cada momento en vez de quedarse con una
-    // foto del arranque, que es lo que despistaba al leer las capturas.
+    // Punto ÚNICO de decisión. Se llama al arrancar y en cada cambio de
+    // sesión, y siempre parte del estado actual: sin banderas que recordar
+    // ni temporizadores que puedan contradecirlo.
+    function aplicarEstado() {
+      const A = window.YESEMS_AUTH;
+      const user = A.getUser();
+      currentUser = user;
+
+      console.log('[admin] estado:', user
+        ? { email: user.email, isAdmin: user.isAdmin }
+        : (A.getToken() ? 'sesión guardada, perfil en camino' : 'sin sesión'));
+
+      if (user && isAdmin(user)) { bootPanel(user); return; }
+      if (user)                  { showGate('denied', user); return; }
+
+      // Sin usuario pero con token: el perfil viene en camino.
+      if (A.getToken()) {
+        if (!booted) showGate('loading');
+        return;
+      }
+      // Sin token: se pide el login.
+      if (booted) { booted = false; state.dirty = false; }
+      showGate('login');
+    }
+
+    aplicarEstado();
+    window.YESEMS_AUTH.onChange(aplicarEstado);
+
+    // Red de seguridad: si el perfil no llega, este repaso periódico abre el
+    // panel en cuanto esté disponible. Es lo que evita quedarse mirando una
+    // pantalla que ya no se corresponde con la realidad.
     setInterval(() => {
+      aplicarEstado();
       const p = gate && !gate.hidden && gateBody && gateBody.querySelector('p:last-of-type');
       if (p) p.outerHTML = diagnostico();
     }, 1000);
-
-    window.YESEMS_AUTH.onChange((user) => {
-      currentUser = user;
-      // Diagnóstico en consola: antes, cuando la puerta rebotaba no había
-      // forma de saber si era falta de sesión o falta de permiso.
-      console.log('[admin] estado de acceso:', user
-        ? { email: user.email, isAdmin: user.isAdmin, emailVerified: user.emailVerified }
-        : 'sin sesión');
-
-      if (!user) {
-        // Con un token guardado y el perfil aún en camino, esto es una
-        // sesión abierta que todavía no ha respondido: pedir login sería
-        // engañoso y es justo lo que dejaba la pantalla atascada.
-        const A = window.YESEMS_AUTH;
-        const esperando = A.isBooting && A.isBooting();
-        // Si el panel ya estaba abierto, la sesión se acaba de invalidar
-        // (caducó o la cuenta se deshabilitó). Hay que cerrarlo: dejarlo
-        // abierto haría que todo pareciera funcionar hasta el momento de
-        // guardar, que fallaría con 401.
-        if (booted) {
-          booted = false;
-          state.dirty = false;      // evita el aviso de "cambios sin guardar"
-        }
-        showGate(esperando ? 'loading' : 'login');
-      }
-      else if (!isAdmin(user)) showGate('denied', user);
-      else bootPanel(user);
-    });
   }
 })();
