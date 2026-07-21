@@ -34,7 +34,7 @@ docs/                              guías de configuración
 
 | Pieza | Dónde vive |
 |---|---|
-| Sitio web | Vercel — Root Directory: `frontend` |
+| Sitio web | Vercel — sirve `frontend/` vía `vercel.json` |
 | Base de datos | Firestore (`site_content`, `user_access`) |
 | Login | Firebase Auth (correo/contraseña y Google) |
 | PDFs e imágenes | Cloud Storage (carpeta `pdfs/`) |
@@ -46,7 +46,8 @@ docs/                              guías de configuración
    la configuración en `frontend/js/config/firebase.js`.
 2. **Pagos** — sigue [docs/SETUP-PAGOS.md](docs/SETUP-PAGOS.md).
 3. **Vercel** — sigue [docs/COMO-SUBIR-A-VERCEL.md](docs/COMO-SUBIR-A-VERCEL.md).
-   Recuerda poner **Root Directory: `frontend`**.
+   El `vercel.json` de la raíz ya apunta a `frontend/`; el campo *Root
+   Directory* de Vercel debe quedarse vacío.
 
 ## Desarrollo local
 

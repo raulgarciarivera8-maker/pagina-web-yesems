@@ -2,26 +2,29 @@
 
 El frontend es **estático** (HTML, CSS y JavaScript). No necesita "build".
 
-> **Lo más importante:** ahora el sitio vive en la carpeta `frontend/`, no en la
-> raíz del repositorio. Hay que decírselo a Vercel con **Root Directory**, o
-> publicará una página en blanco.
+> **Importante:** el sitio vive en la carpeta `frontend/`, no en la raíz del
+> repositorio. De eso se encarga el `vercel.json` de la raíz, con
+> `"outputDirectory": "frontend"`.
+>
+> Por eso el campo **Root Directory** de Vercel debe quedarse **VACÍO**. Si le
+> pones `frontend`, Vercel buscaría `frontend/frontend/` y el sitio saldría en
+> 404. La carpeta se configura en un sitio solamente: el `vercel.json`.
 
 ## Desde GitHub (recomendado)
 
 1. En Vercel: **Add New… → Project → Import** este repositorio.
-2. **Root Directory:** clic en *Edit* y elige **`frontend`**. ← el paso clave
+2. **Root Directory:** déjalo vacío.
 3. **Framework Preset:** **Other** (sin framework).
    Deja vacíos *Build Command* y *Output Directory*.
 4. Clic en **Deploy**.
 
 A partir de ahí, cada `git push` a `main` republica el sitio solo.
 
-### Si el proyecto ya existe en Vercel
+### Si el sitio da 404 en todas las rutas
 
-Solo hay que corregir la carpeta raíz:
-
-**Settings → General → Root Directory → `frontend` → Save**, y después
-**Deployments → … → Redeploy**.
+Señal de que Vercel está sirviendo desde la carpeta equivocada. Comprueba que
+**Settings → General → Root Directory** esté **vacío** y que el `vercel.json`
+de la raíz siga teniendo `"outputDirectory": "frontend"`.
 
 ## Después de publicar
 
