@@ -1,10 +1,9 @@
 // ============================================================
 //  CONTENIDO DEL CURSO  ·  YES EMS
 //  ------------------------------------------------------------
-//  GET  /api/contenido    lo lee cualquiera (alumnos y visitantes)
-//  PUT  /api/contenido    solo administradores
-//
-//  Sustituye a la tabla site_content de Firestore.
+//  GET  /api/contenido           versión pública (vitrina)
+//  GET  /api/contenido/completo  requiere haber pagado
+//  PUT  /api/contenido           solo administradores
 // ============================================================
 const express = require('express');
 const { collections } = require('../db');
@@ -38,17 +37,93 @@ function limpiarCredenciales(valor) {
   return valor;
 }
 
+// ------------------------------------------------------------
+//  Vitrina: lo que ve quien no ha pagado
+// ------------------------------------------------------------
+// Se conservan los títulos y la estructura, que es lo que hace atractivo el
+// curso, y se quita todo lo que constituye el material en sí.
+//
+// Antes esto no existía: el temario completo, los 98 exámenes CON sus
+// respuestas correctas y los enlaces a los PDFs viajaban a cualquier
+// visitante dentro de los archivos .js del sitio. El candado era solo
+// visual, así que bastaba abrir el código fuente para tener el curso entero
+// sin pagar.
+function versionPublica(data) {
+  if (!data) return null;
+
+  const modules = {};
+  for (const [clave, area] of Object.entries(data.modules || {})) {
+    modules[clave] = {
+      title: area.title,
+      guide: undefined,               // el PDF de la guía es material de pago
+      intro: area.intro,
+      subsections: (area.subsections || []).map((sub) => ({
+        title: sub.title,
+        topics: (sub.topics || []).map((t) => ({
+          n: t.n,
+          title: t.title,
+          // def, concepts y example se omiten: son el contenido del curso.
+          bloqueado: true,
+        })),
+      })),
+    };
+  }
+
+  return {
+    areasOrder: data.areasOrder || null,
+    modules,
+    quizzes: {},                      // ni preguntas ni respuestas
+    pdfs: {},                         // ni enlaces a los PDFs
+    subscription: data.subscription || null,
+    esVitrina: true,
+  };
+}
+
+// Quien ya pagó (o el administrador) recibe el documento completo.
+function tieneAcceso(user) {
+  if (!user) return false;
+  const admins = (process.env.ADMIN_EMAILS || '')
+    .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  if (admins.includes(String(user.email || '').toLowerCase())) return true;
+  if (user.accessGranted !== true) return false;
+  if (user.expiresAt && new Date(user.expiresAt) <= new Date()) return false;
+  return true;
+}
+
+async function leerDoc() {
+  const doc = await collections.content().findOne({ id: CONTENT_ID });
+  return doc ? { data: limpiarCredenciales(doc.data), updatedAt: doc.updatedAt } : null;
+}
+
+// ---------- vitrina (pública) ----------
 router.get('/', async (_req, res, next) => {
   try {
-    const doc = await collections.content().findOne({ id: CONTENT_ID });
-    // Sin contenido publicado, el frontend usa sus valores de fábrica.
+    const doc = await leerDoc();
     res.json({
-      data: doc ? limpiarCredenciales(doc.data) : null,
+      data: doc ? versionPublica(doc.data) : null,
       updatedAt: doc ? doc.updatedAt : null,
     });
   } catch (err) { next(err); }
 });
 
+// ---------- contenido completo (solo con acceso) ----------
+router.get('/completo', requireAuth, async (req, res, next) => {
+  try {
+    if (!tieneAcceso(req.user)) {
+      return res.status(403).json({
+        error: 'Necesitas una suscripción activa para ver el material del curso.',
+        requierePago: true,
+      });
+    }
+    const doc = await leerDoc();
+    res.json({
+      data: doc ? doc.data : null,
+      updatedAt: doc ? doc.updatedAt : null,
+    });
+  } catch (err) { next(err); }
+});
+
+// ---------- publicar (solo administradores) ----------
 router.put('/', requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const data = req.body && req.body.data;

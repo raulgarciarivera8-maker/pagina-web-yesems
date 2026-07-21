@@ -103,5 +103,38 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
   r = await call('/api/auth/login', { method: 'POST', body: { email: 'ana@test.mx', password: 'ClaveSegura1' } });
   ok(r.status === 200 && !!r.body.token, 'entra con la contraseña correcta');
 
+
+  console.log('\n--- CONTENIDO DE PAGO ---');
+  // sembramos contenido como si fuera el curso real
+  await db.collection('site_content').updateOne({ id:'acredita-bach' }, { $set: { data: {
+    areasOrder: [{key:'mat',title:'Matematico'}],
+    modules: { mat: { title:'Matematico', guide:'guia.pdf', intro:'intro',
+      subsections:[{ title:'Sub', topics:[{ n:1, title:'Tema uno',
+        def:'DEFINICION SECRETA', concepts:['concepto'], example:'ejemplo' }] }] } },
+    quizzes: { 1: [{ q:'pregunta', options:[['A','a'],['B','b']], correct:'B', just:'porque si' }] },
+    pdfs: { 1: 'https://ejemplo/secreto.pdf' },
+    subscription: { price:'150' }
+  } } }, { upsert:true });
+
+  r = await call('/api/contenido');
+  const pub = r.body.data || {};
+  ok(JSON.stringify(pub).indexOf('DEFINICION SECRETA') === -1, 'la vitrina NO trae las definiciones');
+  ok(Object.keys(pub.quizzes||{}).length === 0, 'la vitrina NO trae examenes');
+  ok(Object.keys(pub.pdfs||{}).length === 0, 'la vitrina NO trae enlaces a PDFs');
+  ok(JSON.stringify(pub).indexOf('Tema uno') !== -1, 'la vitrina SI trae los titulos');
+  ok(JSON.stringify(pub).indexOf('correct') === -1, 'la vitrina NO trae respuestas');
+
+  r = await call('/api/contenido/completo', { token });
+  ok(r.status === 403 && r.body.requierePago, 'sin pagar, el material completo da 403');
+
+  // le damos acceso pagado al usuario
+  await db.collection('users').updateOne({ email:'ana@test.mx' }, { $set: { accessGranted:true } });
+  r = await call('/api/contenido/completo', { token });
+  ok(r.status === 200, 'con suscripcion activa, el material se entrega');
+  ok(JSON.stringify(r.body.data).indexOf('DEFINICION SECRETA') !== -1, 'y SI trae el contenido');
+
+  r = await call('/api/contenido/completo');
+  ok(r.status === 401, 'sin sesion, el material completo da 401');
+
   await cli.close(); await mongo.stop(); process.exit(0);
 })();

@@ -56,12 +56,38 @@
     return c.signal;
   }
 
+  // Pide primero el material completo, que el servidor solo entrega a quien
+  // tiene la suscripción activa (o al administrador). Si no hay acceso, cae
+  // a la vitrina pública: títulos y estructura, sin el material.
+  //
+  // Antes todo el temario y los 98 exámenes con sus respuestas viajaban en
+  // archivos .js a cualquier visitante, así que el candado era decorativo.
   async function fetchDoc() {
     if (!REAL) return null;
+    const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
+
+    if (token) {
+      try {
+        const r = await fetch(API + '/api/contenido/completo', {
+          headers: { Authorization: 'Bearer ' + token },
+          signal: conCorte(20000),
+        });
+        if (r.ok) {
+          const j = await r.json();
+          api.conAcceso = true;
+          return j.data || null;
+        }
+        // 403 = sin suscripción: es lo normal, seguimos con la vitrina.
+      } catch (e) {
+        console.warn('[content] no se pudo pedir el material completo:', e.message);
+      }
+    }
+
     try {
       const r = await fetch(API + '/api/contenido', { signal: conCorte(20000) });
       if (!r.ok) return null;
       const j = await r.json();
+      api.conAcceso = false;
       return j.data || null;
     } catch (e) {
       // El plan free de Render duerme el servicio: la primera petición
@@ -142,10 +168,26 @@
     load, save, uploadPDF,
     data: null,
     source: null,
+    conAcceso: false,
     defaults: DEFAULTS,
     isReal: () => REAL,
   };
   api.ready = load();
+
+  // Al iniciar sesión (o al confirmarse un pago) hay que volver a pedirlo:
+  // la primera carga pudo ser la vitrina y ahora ya toca el material completo.
+  if (window.YESEMS_AUTH && window.YESEMS_AUTH.onChange) {
+    let ultimoToken = null;
+    window.YESEMS_AUTH.onChange(function () {
+      const t = window.YESEMS_AUTH.getToken();
+      if (t === ultimoToken) return;
+      ultimoToken = t;
+      api.ready = load().then(function (doc) {
+        document.dispatchEvent(new CustomEvent('yesems:contenido', { detail: doc }));
+        return doc;
+      });
+    });
+  }
 
   window.YESEMS_CONTENT = api;
 })();
