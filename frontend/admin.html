@@ -10,7 +10,7 @@
 <body class="admin-body">
 
 <!-- ===== Barra superior ===== -->
-<header class="admin-bar" id="adminBar" hidden="">
+<header class="admin-bar" id="adminBar">
   <div class="admin-bar-left">
     <a class="admin-logo" href="index.html" title="Ir al sitio">
       <svg viewBox="0 0 64 64" aria-hidden="true">
@@ -42,7 +42,7 @@
 </header>
 
 <!-- ===== Pantalla de acceso / carga ===== -->
-<div class="admin-gate" id="adminGate">
+<div class="admin-gate" id="adminGate" hidden="">
   <div class="gate-card" id="gateCard">
     <div class="gate-logo">
       <svg viewBox="0 0 64 64" aria-hidden="true">
@@ -93,7 +93,11 @@
 </script>
 
 <!-- ===== Cuerpo del panel ===== -->
-<div class="admin-shell" id="adminShell" hidden="">
+<div id="adminAviso" hidden style="padding:12px 18px;background:#fff4e5;border-bottom:1px solid #f0d9b8;color:#7a4b00;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+  <span id="adminAvisoTexto"></span>
+  <button id="adminAvisoBtn" type="button" style="padding:7px 14px;border:0;border-radius:8px;background:#0a1e3f;color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer">Iniciar sesión</button>
+</div>
+<div class="admin-shell" id="adminShell">
   <aside class="admin-side">
     <nav class="side-tabs" id="sideTabs">
       <button class="side-tab active" data-tab="content" type="button">

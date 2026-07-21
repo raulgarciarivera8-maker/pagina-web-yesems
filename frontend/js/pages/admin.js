@@ -78,41 +78,34 @@
   // los otros tres. Bastaba con que uno se desincronizara para dejar la
   // pantalla en "Cargando" con la sesión perfectamente válida, que es
   // justo lo que pasaba. Sin estados intermedios, eso ya no puede ocurrir.
-  function showGate(kind, user) {
-    gate.hidden = false; bar.hidden = true; shell.hidden = true;
-    // Avisa al vigilante del HTML de que el panel sí arrancó.
+  // El panel SIEMPRE se ve. El estado de la sesión se comunica con una banda
+  // de aviso arriba, no ocultando la pantalla.
+  //
+  // Antes esto era una "puerta" que tapaba todo hasta tener el perfil
+  // confirmado. Esa pantalla dependía de que varias señales coincidieran, y
+  // cuando una fallaba dejaba al administrador mirando "Cargando" con la
+  // sesión válida, sin forma de entrar ni de saber por qué.
+  //
+  // El candado de verdad nunca estuvo aquí: está en el servidor, que
+  // revalida el permiso en cada guardado.
+  function mostrarAviso(texto, textoBoton, alPulsar) {
     window.__ADMIN_JS_OK = true;
-    if (gateBody) gateBody.dataset.listo = '1';
-    const stamp = diagnostico();
-    if (kind === 'loading') {
-      gateBody.innerHTML = `<div class="gate-spinner"></div><h1>Cargando…</h1>
-        <p>Verificando tu acceso. Si el servidor llevaba rato inactivo,
-        puede tardar hasta un minuto en despertar.</p>${stamp}`;
-    } else if (kind === 'login') {
-      gateBody.innerHTML = `
-        <h1>Acceso de administrador</h1>
-        <p>Inicia sesión con un correo autorizado para administrar el contenido del curso.</p>
-        <div class="gate-actions">
-          <button class="gate-btn" id="gateLogin" type="button">Iniciar sesión</button>
-          <a class="gate-btn alt" href="index.html">Volver al sitio</a>
-        </div>${stamp}`;
-      $('#gateLogin').addEventListener('click', () => window.YESEMS_AUTH.openModal('login'));
-    } else {
-      gateBody.innerHTML = `
-        <div class="gate-icon-bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg></div>
-        <h1>Sin permiso</h1>
-        <p>La cuenta <span class="gate-mail">${esc(user && user.email)}</span> no está autorizada como administrador.</p>
-        <div class="gate-actions">
-          <button class="gate-btn alt" id="gateLogout" type="button">Cambiar de cuenta</button>
-          <a class="gate-btn alt" href="index.html">Volver al sitio</a>
-        </div>${stamp}`;
-      $('#gateLogout').addEventListener('click', () => window.YESEMS_AUTH.logout());
+    const caja = $('#adminAviso');
+    const txt  = $('#adminAvisoTexto');
+    const btn  = $('#adminAvisoBtn');
+    if (!caja || !txt || !btn) return;
+    if (!texto) { caja.hidden = true; return; }
+    txt.innerHTML = texto;
+    caja.hidden = false;
+    btn.hidden = !textoBoton;
+    if (textoBoton) {
+      btn.textContent = textoBoton;
+      btn.onclick = alPulsar;
     }
   }
-  function hideGate() {
-    window.__ADMIN_JS_OK = true;
-    if (gateBody) gateBody.dataset.listo = '1';
-    gate.hidden = true; bar.hidden = false; shell.hidden = false; }
+
+  function showGate() { /* sustituido por mostrarAviso */ }
+  function hideGate() { window.__ADMIN_JS_OK = true; mostrarAviso(null); }
 
   // =========================================================
   //  INIT del panel (una sola vez, tras autorizar)
@@ -782,41 +775,36 @@
   if (!window.YESEMS_AUTH) {
     gateBody.innerHTML = `<h1>Error</h1><p>No se pudo cargar la autenticación. Revisa que auth.js esté incluido.</p>`;
   } else {
-    // Punto ÚNICO de decisión. Se llama al arrancar y en cada cambio de
-    // sesión, y siempre parte del estado actual: sin banderas que recordar
-    // ni temporizadores que puedan contradecirlo.
+    // El panel se monta de entrada, haya sesión o no. Nunca queda una
+    // pantalla intermedia que pueda atascarse.
+    bootPanel({ email: '—', name: 'A' });
+
     function aplicarEstado() {
       const A = window.YESEMS_AUTH;
       const user = A.getUser();
       currentUser = user;
 
-      console.log('[admin] estado:', user
-        ? { email: user.email, isAdmin: user.isAdmin }
-        : (A.getToken() ? 'sesión guardada, perfil en camino' : 'sin sesión'));
+      const elEmail = $('#adminEmail');
+      if (elEmail) elEmail.textContent = user ? user.email : '—';
 
-      if (user && isAdmin(user)) { bootPanel(user); return; }
-      if (user)                  { showGate('denied', user); return; }
-
-      // Sin usuario pero con token: el perfil viene en camino.
-      if (A.getToken()) {
-        if (!booted) showGate('loading');
-        return;
+      if (user && isAdmin(user)) {
+        mostrarAviso(null);                       // todo en orden
+      } else if (user) {
+        mostrarAviso(
+          'La cuenta <strong>' + esc(user.email) + '</strong> no está autorizada como ' +
+          'administrador, así que los cambios no se podrán publicar.',
+          'Cambiar de cuenta', () => A.logout());
+      } else if (A.getToken()) {
+        mostrarAviso('Comprobando tu sesión con el servidor…', null, null);
+      } else {
+        mostrarAviso('Inicia sesión con un correo autorizado para poder publicar cambios.',
+          'Iniciar sesión', () => A.openModal('login'));
       }
-      // Sin token: se pide el login.
-      if (booted) { booted = false; state.dirty = false; }
-      showGate('login');
     }
 
     aplicarEstado();
     window.YESEMS_AUTH.onChange(aplicarEstado);
-
-    // Red de seguridad: si el perfil no llega, este repaso periódico abre el
-    // panel en cuanto esté disponible. Es lo que evita quedarse mirando una
-    // pantalla que ya no se corresponde con la realidad.
-    setInterval(() => {
-      aplicarEstado();
-      const p = gate && !gate.hidden && gateBody && gateBody.querySelector('p:last-of-type');
-      if (p) p.outerHTML = diagnostico();
-    }, 1000);
+    // Repaso periódico: si el perfil llega tarde, la banda se actualiza sola.
+    setInterval(aplicarEstado, 1500);
   }
 })();
