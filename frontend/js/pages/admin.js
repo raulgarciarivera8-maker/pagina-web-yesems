@@ -165,11 +165,21 @@
       toast('Cambios guardados y publicados ✓', 'ok');
     } catch (err) {
       console.error(err);
-      let msg = err.message || 'No se pudo guardar.';
-      if (/relation .* does not exist|site_content/i.test(msg) || /Could not find the table/i.test(msg)) {
-        msg = 'Falta crear la base de datos en Firebase. Abre SETUP-FIREBASE.md y sigue el Paso 1.';
-      } else if (/row-level security|violates|policy|permission/i.test(msg)) {
-        msg = 'Tu cuenta no tiene permiso de escritura. Revisa las políticas (Paso 1) y que tu correo esté autorizado.';
+      // Firebase reporta el motivo en err.code, no en el texto del mensaje.
+      let msg = 'No se pudo guardar.';
+      if (err.code === 'permission-denied') {
+        // La causa más común: las reglas exigen el correo verificado.
+        const u = window.YESEMS_AUTH && window.YESEMS_AUTH.getUser();
+        msg = 'Tu cuenta no tiene permiso para publicar. Revisa que ' +
+              (u && u.email ? '“' + u.email + '”' : 'tu correo') +
+              ' esté en la lista de administradores de firestore.rules y que hayas ' +
+              'confirmado el correo de verificación que te envió Firebase.';
+      } else if (err.code === 'unavailable' || err.code === 'deadline-exceeded') {
+        msg = 'Sin conexión con Firebase. Revisa tu internet e inténtalo de nuevo.';
+      } else if (err.code === 'not-found' || err.code === 'failed-precondition') {
+        msg = 'Falta crear la base de datos Firestore. Abre docs/SETUP-FIREBASE.md y sigue el Paso 3.';
+      } else if (err.code === 'unauthenticated') {
+        msg = 'Tu sesión expiró. Vuelve a iniciar sesión e inténtalo de nuevo.';
       }
       toast(msg, 'err');
     } finally {
@@ -554,9 +564,18 @@
       renderMain();
     } catch (err) {
       console.error(err);
-      let msg = err.message || 'No se pudo subir.';
-      if (/Bucket not found/i.test(msg)) msg = 'Falta crear el almacén “pdfs” en Firebase (SETUP, Paso 2).';
-      else if (/row-level security|policy|permission|Unauthorized/i.test(msg)) msg = 'Sin permiso para subir. Revisa las políticas del Paso 2 y tu correo de admin.';
+      // Códigos de Cloud Storage (storage/…).
+      let msg = 'No se pudo subir el archivo.';
+      if (err.code === 'storage/unauthorized') {
+        msg = 'Sin permiso para subir. Revisa que tu correo esté en storage.rules, ' +
+              'que lo hayas verificado, y que el PDF pese menos de 25 MB.';
+      } else if (err.code === 'storage/unauthenticated') {
+        msg = 'Tu sesión expiró. Vuelve a iniciar sesión e inténtalo de nuevo.';
+      } else if (err.code === 'storage/retry-limit-exceeded' || err.code === 'storage/canceled') {
+        msg = 'La subida se interrumpió. Revisa tu conexión e inténtalo de nuevo.';
+      } else if (err.code === 'storage/unknown') {
+        msg = 'Falta activar Cloud Storage. Abre docs/SETUP-FIREBASE.md y sigue el Paso 4.';
+      }
       toast(msg, 'err');
       el.value = '';
     }
