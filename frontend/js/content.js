@@ -1,37 +1,24 @@
 // ============================================================
 //  CONTENT STORE  ·  YES EMS
 //  ------------------------------------------------------------
-//  Puente entre la página y Firebase para el CONTENIDO del curso
+//  Puente entre la página y la API para el CONTENIDO del curso
 //  (áreas, temas, exámenes, PDFs y suscripción).
 //
-//  - load()        carga el contenido desde Firestore (o usa los
-//                  valores por defecto si aún no hay nada guardado).
+//  - load()        carga el contenido publicado (o los valores de
+//                  fábrica si aún no hay nada guardado).
 //  - save(doc)     guarda TODO el contenido (solo administradores).
-//  - uploadPDF()   sube un archivo PDF a Cloud Storage.
+//  - uploadPDF()   sube un PDF a Cloudinary y devuelve su URL.
 //  - ready         promesa que se resuelve cuando el contenido cargó.
 //  - data          el documento de contenido ya combinado y listo.
-//  - defaults      copia de los valores de fábrica.
 //
 //  Debe cargarse DESPUÉS de: data/modules.js, data/quizzes.js,
-//  data/defaults.js, config/firebase.js y auth.js.
+//  data/defaults.js, config/api.js y auth.js.
 // ============================================================
 (function () {
-  const cfg  = window.YESEMS_FIREBASE || {};
-  const REAL = !!(cfg.apiKey && cfg.projectId);
-  const CONTENT_ID = 'acredita-bach';
-  const COLLECTION = 'site_content';
-  const BUCKET_DIR = 'pdfs';
+  const API = (window.YESEMS_API_URL || '').replace(/\/$/, '');
+  const REAL = !!API;
 
   const clone = (o) => (o == null ? o : JSON.parse(JSON.stringify(o)));
-
-  // App de Firebase: reusa la que inicializó auth.js; si no existe, la crea.
-  let app = window.YESEMS_FB_APP || null;
-  if (!app && REAL && window.firebase) {
-    app = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
-    window.YESEMS_FB_APP = app;
-  }
-  const db = app ? firebase.firestore() : null;
-  const storage = app ? firebase.storage() : null;
 
   // ---- Captura de los valores de fábrica (ANTES de aplicar remoto) ----
   const DEFAULTS = {
@@ -62,14 +49,16 @@
   }
 
   async function fetchDoc() {
-    if (!db) return null;
+    if (!REAL) return null;
     try {
-      const snap = await db.collection(COLLECTION).doc(CONTENT_ID).get();
-      if (!snap.exists) return null;
-      // El contenido vive bajo el campo "data", igual que antes.
-      return snap.data().data || null;
+      const r = await fetch(API + '/api/contenido');
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j.data || null;
     } catch (e) {
-      console.warn('[content] lectura falló:', e.message);
+      // El plan free de Render duerme el servicio: la primera petición
+      // puede tardar o fallar. La página sigue con los valores de fábrica.
+      console.warn('[content] no se pudo cargar el contenido:', e.message);
       return null;
     }
   }
@@ -80,28 +69,65 @@
     const doc = mergeDefaults(remote);
     apply(doc);
     api.data   = doc;
-    api.source = hasRemote ? 'firebase' : 'defaults';
+    api.source = hasRemote ? 'api' : 'defaults';
     return doc;
   }
 
-  async function save(doc, email) {
-    if (!db) throw new Error('Firebase no está configurado.');
-    await db.collection(COLLECTION).doc(CONTENT_ID).set({
-      data: doc,
-      updated_at: new Date().toISOString(),
-      updated_by: email || null
+  async function save(doc) {
+    if (!REAL) throw new Error('La API no está configurada.');
+    const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
+    if (!token) throw new Error('Inicia sesión para guardar.');
+
+    const r = await fetch(API + '/api/contenido', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+      body: JSON.stringify({ data: doc }),
     });
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      const err = new Error(j.error || 'No se pudo guardar.');
+      err.status = r.status;
+      throw err;
+    }
     api.data = clone(doc);
-    api.source = 'firebase';
+    api.source = 'api';
   }
 
-  async function uploadPDF(file, email) {
-    if (!storage) throw new Error('Firebase no está configurado.');
-    const safe = (file.name || 'documento.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
-    const path = BUCKET_DIR + '/' + Date.now() + '_' + safe;
-    const ref  = storage.ref().child(path);
-    await ref.put(file, { contentType: file.type || 'application/pdf' });
-    return await ref.getDownloadURL();
+  // Sube el PDF DIRECTO a Cloudinary. El servidor solo entrega una firma
+  // temporal: la llave secreta nunca llega al navegador, y el archivo no
+  // pasa por Render (que en el plan free tarda en despertar).
+  async function uploadPDF(file) {
+    if (!REAL) throw new Error('La API no está configurada.');
+    const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
+    if (!token) throw new Error('Inicia sesión para subir archivos.');
+
+    const rf = await fetch(API + '/api/archivos/firma', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+    });
+    if (!rf.ok) {
+      const j = await rf.json().catch(() => ({}));
+      throw new Error(j.error || 'No se pudo preparar la subida.');
+    }
+    const f = await rf.json();
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('api_key', f.apiKey);
+    fd.append('timestamp', f.timestamp);
+    fd.append('signature', f.signature);
+    fd.append('folder', f.folder);
+
+    const ru = await fetch(f.uploadUrl, { method: 'POST', body: fd });
+    if (!ru.ok) {
+      const j = await ru.json().catch(() => ({}));
+      throw new Error((j.error && j.error.message) || 'Cloudinary rechazó el archivo.');
+    }
+    const up = await ru.json();
+    return up.secure_url;
   }
 
   const api = {
@@ -110,9 +136,6 @@
     source: null,
     defaults: DEFAULTS,
     isReal: () => REAL,
-    hasClient: () => !!db,
-    client: () => db,
-    CONTENT_ID, COLLECTION, BUCKET_DIR
   };
   api.ready = load();
 

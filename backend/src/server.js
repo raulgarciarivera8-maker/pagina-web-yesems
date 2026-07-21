@@ -44,6 +44,7 @@ app.get('/api/salud', (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
 app.use('/api/auth', require('./routes/auth').router);
 app.use('/api/contenido', require('./routes/contenido'));
+app.use('/api/archivos', require('./routes/archivos'));
 app.use('/api/pagos', require('./routes/pagos'));
 
 app.use((_req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
