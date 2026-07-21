@@ -40,7 +40,29 @@ app.use(cors({
 
 // Render apaga el servicio tras 15 min sin tráfico. Este endpoint sirve
 // para despertarlo y para comprobar que sigue vivo.
-app.get('/api/salud', (_req, res) => res.json({ ok: true, ts: Date.now() }));
+//
+// Informa además QUÉ está configurado, nunca con qué valor: solo si la
+// variable existe. Sin esto, diagnosticar un ajuste que falta obliga a
+// adivinar a ciegas.
+app.get('/api/salud', (_req, res) => {
+  const admins = (process.env.ADMIN_EMAILS || '')
+    .split(',').map((e) => e.trim()).filter(Boolean);
+  res.json({
+    ok: true,
+    ts: Date.now(),
+    config: {
+      mongo:      true,                            // si no, el proceso no habría arrancado
+      sendgrid:   !!process.env.SENDGRID_API_KEY,
+      mailFrom:   !!process.env.MAIL_FROM,
+      cloudinary: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_SECRET),
+      mercadoPago: !!process.env.MERCADO_PAGO_ACCESS_TOKEN,
+      webhookSecret: !!process.env.MERCADO_PAGO_WEBHOOK_SECRET,
+      siteUrl:    process.env.SITE_URL || null,    // pública: ya se ve en las cabeceras CORS
+      apiUrl:     !!process.env.API_URL,
+      admins:     admins.length,                   // cuántos, no quiénes
+    },
+  });
+});
 
 app.use('/api/auth', require('./routes/auth').router);
 app.use('/api/contenido', require('./routes/contenido'));
