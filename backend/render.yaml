@@ -1,0 +1,40 @@
+# Blueprint de Render. Al importar el repositorio, Render lee este archivo
+# y crea el servicio con la configuración correcta.
+#
+# Las variables marcadas sync:false NO se guardan aquí: las escribes en
+# Render → Settings → Environment. Son secretos.
+services:
+  - type: web
+    name: yesems-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/salud
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: SITE_URL
+        value: https://pagina-web-yesems.vercel.app
+      - key: ADMIN_EMAILS
+        value: raulyeyo12@gmail.com,raulgarciarivera08@gmail.com
+      - key: MAIL_FROM
+        value: contacto@yesems.mx
+      - key: MONGODB_DB
+        value: yesems
+      # Render puede generar el secreto de sesión por ti.
+      - key: JWT_SECRET
+        generateValue: true
+      # Estos los pegas tú en el panel:
+      - key: MONGODB_URI
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: MERCADO_PAGO_ACCESS_TOKEN
+        sync: false
+      - key: MERCADO_PAGO_WEBHOOK_SECRET
+        sync: false
+      - key: API_URL
+        sync: false

@@ -12,7 +12,7 @@ backend/serviceAccount.json
 backend/scripts/pdf-urls.json
 .env
 .env.local
-backend/functions/.env
+backend/.env
 .firebase/
 
 # Scripts temporales
