@@ -766,7 +766,15 @@
         // engañoso y es justo lo que dejaba la pantalla atascada.
         const A = window.YESEMS_AUTH;
         const esperando = A.isBooting && A.isBooting();
-        if (!booted) showGate(esperando ? 'loading' : 'login');
+        // Si el panel ya estaba abierto, la sesión se acaba de invalidar
+        // (caducó o la cuenta se deshabilitó). Hay que cerrarlo: dejarlo
+        // abierto haría que todo pareciera funcionar hasta el momento de
+        // guardar, que fallaría con 401.
+        if (booted) {
+          booted = false;
+          state.dirty = false;      // evita el aviso de "cambios sin guardar"
+        }
+        showGate(esperando ? 'loading' : 'login');
       }
       else if (!isAdmin(user)) showGate('denied', user);
       else bootPanel(user);
