@@ -24,6 +24,7 @@
   // Hay un token guardado y aún estamos recuperando el perfil. Sirve para no
   // enseñar "inicia sesión" a alguien que ya tiene la sesión abierta.
   let booting = false;
+  let intentoActual = 1;          // se muestra en la pantalla de carga
   const listeners = [];
 
   function notify() { listeners.forEach((cb) => { try { cb(currentUser); } catch (e) {} }); }
@@ -31,6 +32,7 @@
   function getUser() { return currentUser; }
   function getToken() { return token; }
   function isBooting() { return booting; }
+  function getIntento() { return intentoActual; }
 
   // ---------- almacenamiento de la sesión ----------
   function saveToken(t) {
@@ -176,12 +178,18 @@
       if (u) return u;
       // Si el token dejó de ser válido, no tiene sentido reintentar.
       if (!token) return null;
-      // Solo reintentamos cuando el fallo pudo ser por el servidor dormido.
+      // Reintentamos ante fallos que puedan venir del servidor dormido:
+      // sin conexión, 5xx, o una petición que expiró esperándolo. Este
+      // último faltaba, y era justo el caso del arranque en frío: se
+      // agotaba el tiempo, no coincidía con el patrón y se rendía sin
+      // reintentar ni una vez.
       const err = window.__YESEMS_LAST_AUTH_ERROR || '';
-      if (!/sin conexión|^0 |50\d /.test(err)) return null;
+      if (!/sin conexión|expiró|^0 |50\d /.test(err)) return null;
+      if (intento === 4) break;
       booting = true;
+      intentoActual = intento + 1;
       notify();
-      await new Promise((r) => setTimeout(r, intento * 3000));
+      await new Promise((r) => setTimeout(r, 2000));
     }
     booting = false;
     notify();
@@ -465,7 +473,7 @@
 
   // ---------- export ----------
   window.YESEMS_AUTH = {
-    getUser, getToken, isBooting, onChange, openModal, logout, refresh,
+    getUser, getToken, isBooting, getIntento, onChange, openModal, logout, refresh,
     recoverPassword, resendVerification,
     isReal: () => REAL,
   };

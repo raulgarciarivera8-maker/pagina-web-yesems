@@ -55,6 +55,8 @@
     const partes = [
       'API: ' + (window.YESEMS_API_URL ? 'configurada' : 'FALTA'),
       'sesión: ' + (A && A.getToken && A.getToken() ? 'sí' : 'no'),
+      ...(A && A.isBooting && A.isBooting() && A.getIntento
+          ? ['intento ' + A.getIntento() + ' de 4'] : []),
     ];
     const u = A && A.getUser && A.getUser();
     if (u) {
