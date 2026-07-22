@@ -1787,13 +1787,29 @@ button { font-family: inherit; cursor: pointer; }
 [class*="btn"]:has(svg):not(.btn-whatsapp):not(.btn-primary):not(.btn-ghost):not(.btn-light):not(.btn-outline):not(.btn-check):not(.btn-reset):not(.sub-cta):not(.sub-banner-manage) {
   display: none !important;
 }
-button:not(.sub-cta):not(.sub-buy):not(.area-trigger):not(.btn-check):not(.btn-reset):not(.topic-trigger) {
+button:not(.sub-cta):not(.sub-buy):not(.area-trigger):not(.btn-check):not(.btn-reset):not(.topic-trigger):not(.auth-submit):not(.auth-x):not(.auth-link):not(.acct-login):not(.acct-btn):not(.acct-menu-item) {
   display: none !important;
 }
 .sub-card button, .sub-card a { display: flex !important; }
 .topic-head button { display: flex !important; }
 .area-trigger { display: flex !important; }
 .ys-auth-slot .acct-login { display: inline-flex !important; }
+
+/* ============================================================
+   El CSS del constructor trae una regla que oculta TODOS los
+   <button> salvo una lista blanca, y otra que hace que .auth-field
+   ignore el atributo hidden. Entre las dos dejaban el modal de
+   acceso sin boton "Entrar" y con el campo Nombre visible de mas.
+   Se restauran aqui los controles del modal.
+   ============================================================ */
+[hidden] { display: none !important; }
+.auth-modal .auth-submit { display: block !important; }
+.auth-modal .auth-x,
+.auth-modal .auth-google { display: inline-flex !important; }
+.auth-modal .auth-link,
+.auth-modal #authSwitch,
+.auth-modal #authRecover { display: inline !important; }
+.auth-modal .auth-name-field[hidden] { display: none !important; }
 </style>
 <script>
 (function(){
