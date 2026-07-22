@@ -26,13 +26,12 @@
       </span>
     </a>`;
 
+  // Solo las páginas que existen de verdad. Nosotros, Tecnología Educativa,
+  // Plataforma y Contacto eran secciones del sitio viejo que ya no existen
+  // (redirigían a la portada), así que se quitan del menú.
   const NAV_ITEMS = [
-    { key: 'inicio',                   label: 'Inicio',                  href: 'index.html' },
-    { key: 'nosotros',                 label: 'Nosotros',                href: 'nosotros.html' },
-    { key: 'acredita-bach',            label: 'Acredita-Bach',           href: 'acredita-bach.html' },
-    { key: 'tecnologia-educativa',     label: 'Tecnología Educativa',    href: 'tecnologia-educativa.html', caret: true },
-    { key: 'plataforma',               label: 'Plataforma',              href: 'plataforma.html' },
-    { key: 'contacto',                 label: 'Contacto',                href: 'contacto.html' }
+    { key: 'inicio',        label: 'Inicio',        href: 'index.html' },
+    { key: 'acredita-bach', label: 'Acredita-Bach', href: 'acredita-bach.html' },
   ];
 
   const WHATSAPP_URL = 'https://api.whatsapp.com/send/?phone=5215648666596&text=%21Hola%21+Vengo+de+la+web+y+requiero+mas+informaci%C3%B3n+de+sus+productos&type=phone_number&app_absent=0';

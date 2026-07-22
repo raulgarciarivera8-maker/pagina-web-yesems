@@ -370,12 +370,14 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .hero-side-card {
-  position: absolute; top: 20px; right: -8px;
-  width: 240px;
-  background: #fff;
+  /* Abajo-izquierda, sobre la ventana, para no tapar a la persona. */
+  position: absolute; bottom: 18px; left: 18px;
+  width: 230px; max-width: calc(100% - 36px);
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(2px);
   color: var(--ink);
   border-radius: var(--r-lg);
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-lg);
 }
 .hero-side-card .badge {
