@@ -1760,15 +1760,15 @@ button { font-family: inherit; cursor: pointer; }
 
 <div id="ys-footer"></div>
 
-<script src="js/data/modules.js?v=202607221518"></script>
-<script src="js/data/quizzes.js?v=202607221518"></script>
-<script src="js/data/defaults.js?v=202607221518"></script>
+<script src="js/data/modules.js?v=202607221536"></script>
+<script src="js/data/quizzes.js?v=202607221536"></script>
+<script src="js/data/defaults.js?v=202607221536"></script>
 
-<script src="js/config/api.js?v=202607221518"></script>
-<script src="js/auth.js?v=202607221518"></script>
-<script src="js/content.js?v=202607221518"></script>
-<script src="js/shared/layout.js?v=202607221518"></script>
-<script src="js/pages/acredita-bach.js?v=202607221518"></script>
+<script src="js/config/api.js?v=202607221536"></script>
+<script src="js/auth.js?v=202607221536"></script>
+<script src="js/content.js?v=202607221536"></script>
+<script src="js/shared/layout.js?v=202607221536"></script>
+<script src="js/pages/acredita-bach.js?v=202607221536"></script>
 
 <style id="__om-edit-overrides">
 .btn-whatsapp >svg { width: 1px !important }
@@ -1810,6 +1810,23 @@ button:not(.sub-cta):not(.sub-buy):not(.area-trigger):not(.btn-check):not(.btn-r
 .auth-modal #authSwitch,
 .auth-modal #authRecover { display: inline !important; }
 .auth-modal .auth-name-field[hidden] { display: none !important; }
+
+/* ============================================================
+   BLINDAJE de los controles de sesion.
+   El constructor trae varias reglas que ocultan elementos por patron:
+     - button:not(lista-blanca) { display:none }
+     - [class*="btn"]:has(svg):not(lista-blanca) { display:none }
+   El boton de cuenta (.acct-btn, que lleva "btn" y un svg de flecha)
+   caia en la segunda y desaparecia al iniciar sesion. En vez de perseguir
+   cada regla, se fuerzan visibles los controles propios con especificidad
+   de id + !important, que gana a cualquiera de esas reglas.
+   ============================================================ */
+#ys-auth .acct-btn   { display: inline-flex !important; }
+#ys-auth .acct-login { display: inline-flex !important; }
+#ys-auth .acct       { display: block !important; }
+#ys-auth .acct-menu  { display: block !important; }
+#ys-auth .acct-menu[hidden] { display: none !important; }
+#ys-auth .acct-menu-item { display: flex !important; }
 </style>
 <script>
 (function(){
@@ -1858,5 +1875,5 @@ button:not(.sub-cta):not(.sub-buy):not(.area-trigger):not(.btn-check):not(.btn-r
 
 <!-- Checkout (Mercado Pago) -->
 <script src="https://sdk.mercadopago.com/js/v2"></script>
-<script src="js/pages/checkout.js?v=202607221518"></script>
+<script src="js/pages/checkout.js?v=202607221536"></script>
 </body></html>
