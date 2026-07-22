@@ -86,10 +86,10 @@
         <button class="hamburger" id="ysHamburger" aria-label="Menú">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
+        <div id="ys-auth" class="ys-auth-slot"></div>
         <a class="btn-whatsapp" href="${WHATSAPP_URL}" target="_blank" rel="noopener">
           ${WA_ICON}<span>WhatsApp</span>
         </a>
-        <div id="ys-auth" class="ys-auth-slot"></div>
       </div>
     </header>`;
 
