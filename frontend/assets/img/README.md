@@ -1,9 +1,7 @@
-# Imágenes del sitio
+# Imagenes del sitio
 
-Falta la foto del hero: coloca aquí `hero-acredita.jpg`.
+`hero-acredita.jpg` — foto del hero de la portada (estudiante estudiando).
+Optimizada a JPG ~37 KB. La usan index.html y acredita-bach.html.
 
-- Tamaño recomendado: 1200x900 px
-- Peso: menos de 300 KB (usa https://squoosh.app para comprimir)
-
-La usa el `<img id="hero-acredita">` de `index.html` y `acredita-bach.html`.
-Mientras no exista, ese espacio se ve como un recuadro gris.
+Si la reemplazas, manten el nombre y mantenla por debajo de ~150 KB
+(recomprime en https://squoosh.app si hace falta).
