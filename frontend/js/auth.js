@@ -438,6 +438,12 @@
   function renderHeaderAuth(user) {
     const slot = document.getElementById('ys-auth');
     if (!slot) return;
+    // Clave del estado que debe verse ahora. Si ya es lo que hay pintado, no
+    // se toca el DOM: eso evita el bucle infinito con el observer persistente
+    // (repintar dispararía el observer, que repintaría otra vez...).
+    const clave = user ? ('acct:' + (user.email || '')) : 'login';
+    if (slot.dataset.authState === clave && slot.innerHTML.trim() !== '') return;
+    slot.dataset.authState = clave;
     if (user) {
       const initial = (user.name || user.email || '?').trim().charAt(0).toUpperCase();
       slot.innerHTML = `
@@ -494,24 +500,32 @@
   setTimeout(tryRender, 0);
   setTimeout(tryRender, 300);
 
-  // GARANTÍA: espera a que aparezca el slot #ys-auth (lo inyecta partials.js
-  // de forma asíncrona) y entonces pinta el estado de sesión UNA vez.
-  // IMPORTANTE: el observer se DESCONECTA en cuanto encuentra el slot. Si no,
-  // como renderHeaderAuth modifica el DOM (slot.innerHTML), cada repintado
-  // dispararía el observer otra vez → bucle infinito que congela la página.
+  // GARANTÍA auto-reparable: el observer NO se desconecta. Antes se cortaba
+  // tras el primer render, y si el header se re-inyectaba o algo vaciaba el
+  // slot despues (que es lo que dejaba el header sin login ni cuenta "de un
+  // momento a otro"), ya nadie lo repintaba. Ahora se repinta en cada cambio
+  // del DOM, y renderHeaderAuth es idempotente: si el estado ya es el
+  // correcto no toca nada, asi que no hay bucle.
   (function watchAuthSlot() {
-    if (document.getElementById('ys-auth')) { tryRender(); return; }
-    const obs = new MutationObserver(() => {
-      if (document.getElementById('ys-auth')) {
-        obs.disconnect();   // <-- corta el ciclo antes de tocar el DOM
-        tryRender();
+    tryRender();
+    // El observer vigila SOLO si aparece/desaparece un #ys-auth (childList en
+    // body), no cada cambio del DOM: asi no reacciona a que renderHeaderAuth
+    // escriba dentro del slot, y no hay riesgo de bucle. Cuando el header se
+    // re-inyecta (slot nuevo y vacio), esto lo vuelve a pintar.
+    const obs = new MutationObserver((registros) => {
+      for (const r of registros) {
+        for (const nodo of r.addedNodes) {
+          if (nodo.nodeType === 1 && (nodo.id === 'ys-auth' || (nodo.querySelector && nodo.querySelector('#ys-auth')))) {
+            tryRender();
+            return;
+          }
+        }
       }
+      // Tambien repinta si el slot existe pero quedo vacio.
+      const s = document.getElementById('ys-auth');
+      if (s && s.innerHTML.trim() === '') tryRender();
     });
-    const start = () => {
-      // por si el slot apareció entre el chequeo inicial y aquí
-      if (document.getElementById('ys-auth')) { tryRender(); return; }
-      obs.observe(document.body, { childList: true, subtree: true });
-    };
+    const start = () => obs.observe(document.body, { childList: true, subtree: true });
     if (document.body) start();
     else document.addEventListener('DOMContentLoaded', start);
   })();
