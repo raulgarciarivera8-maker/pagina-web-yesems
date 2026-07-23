@@ -808,9 +808,16 @@
       } else {
         mostrarAviso('Inicia sesión con un correo autorizado para poder publicar cambios.',
           'Iniciar sesión', () => A.openModal('login'));
+        // Al entrar sin sesión, abre el formulario de acceso una sola vez, para
+        // que el login aparezca solo en vez de tener que buscar el botón.
+        if (!loginAutoAbierto) {
+          loginAutoAbierto = true;
+          A.openModal('login');
+        }
       }
     }
 
+    let loginAutoAbierto = false;
     aplicarEstado();
     window.YESEMS_AUTH.onChange(aplicarEstado);
     // Repaso periódico: si el perfil llega tarde, la banda se actualiza sola.
