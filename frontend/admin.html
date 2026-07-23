@@ -5,7 +5,7 @@
 <title>YES EMS · Panel de Administrador</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/admin.css?v=202607231040">
+<link rel="stylesheet" href="css/admin.css?v=202607231101">
 </head>
 <body class="admin-body">
 
@@ -41,8 +41,11 @@
   </div>
 </header>
 
-<!-- ===== Pantalla de acceso / carga ===== -->
-<div class="admin-gate" id="adminGate" hidden="">
+<!-- ===== Pantalla de acceso / barrera ===== -->
+<!-- Nace VISIBLE: cubre el panel desde el primer instante, para que no se
+     alcance a ver ni tocar nada sin ser administrador. admin.js la oculta
+     solo cuando confirma una sesion de administrador. -->
+<div class="admin-gate" id="adminGate">
   <div class="gate-card" id="gateCard">
     <div class="gate-logo">
       <svg viewBox="0 0 64 64" aria-hidden="true">
@@ -134,13 +137,13 @@
 <script>window.YESEMS_PAGE = "admin";</script>
 
 <!-- Datos y configuración (compartidos con las páginas públicas) -->
-<script src="js/data/modules.js?v=202607231040"></script>
-<script src="js/data/quizzes.js?v=202607231040"></script>
-<script src="js/data/defaults.js?v=202607231040"></script>
-<script src="js/config/api.js?v=202607231040"></script>
+<script src="js/data/modules.js?v=202607231101"></script>
+<script src="js/data/quizzes.js?v=202607231101"></script>
+<script src="js/data/defaults.js?v=202607231101"></script>
+<script src="js/config/api.js?v=202607231101"></script>
 
 <!-- Lógica -->
-<script src="js/auth.js?v=202607231040"></script>
-<script src="js/content.js?v=202607231040"></script>
-<script src="js/pages/admin.js?v=202607231040"></script>
+<script src="js/auth.js?v=202607231101"></script>
+<script src="js/content.js?v=202607231101"></script>
+<script src="js/pages/admin.js?v=202607231101"></script>
 </body></html>

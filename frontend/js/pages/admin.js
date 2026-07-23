@@ -808,16 +808,50 @@
       } else {
         mostrarAviso('Inicia sesión con un correo autorizado para poder publicar cambios.',
           'Iniciar sesión', () => A.openModal('login'));
-        // Al entrar sin sesión, abre el formulario de acceso una sola vez, para
-        // que el login aparezca solo en vez de tener que buscar el botón.
-        if (!loginAutoAbierto) {
-          loginAutoAbierto = true;
-          A.openModal('login');
-        }
+      }
+
+      // BARRERA: el panel solo se destapa para un administrador. Sin sesión,
+      // con sesión no-admin, o mientras se comprueba, se cubre todo con la
+      // pantalla de acceso; asi no se puede tocar el panel de atras.
+      const esAdmin = user && isAdmin(user);
+      bloquearPanel(!esAdmin, user, A);
+    }
+
+    // Muestra u oculta la pantalla-barrera sobre el panel.
+    function bloquearPanel(bloquear, user, A) {
+      const gate = $('#adminGate');
+      const body = $('#gateBody');
+      if (!gate) return;
+
+      if (!bloquear) { gate.hidden = true; return; }
+      gate.hidden = false;
+
+      let html;
+      if (user) {
+        // Con sesión pero sin permiso de admin.
+        html = '<h1>Sin permiso</h1>' +
+          '<p>La cuenta <strong>' + esc(user.email) + '</strong> no está autorizada ' +
+          'como administrador.</p>' +
+          '<div class="gate-actions">' +
+          '<button class="gate-btn" id="gateOtra" type="button">Usar otra cuenta</button>' +
+          '<a class="gate-btn alt" href="index.html">Volver al sitio</a></div>';
+      } else if (A.getToken()) {
+        html = '<h1>Comprobando…</h1><p>Verificando tu acceso.</p>';
+      } else {
+        html = '<h1>Acceso de administrador</h1>' +
+          '<p>Inicia sesión con un correo autorizado para administrar el curso.</p>' +
+          '<div class="gate-actions">' +
+          '<button class="gate-btn" id="gateEntrar" type="button">Iniciar sesión</button>' +
+          '<a class="gate-btn alt" href="index.html">Volver al sitio</a></div>';
+      }
+      if (body && body.dataset.estado !== html) {
+        body.dataset.estado = html;
+        body.innerHTML = html;
+        const e = $('#gateEntrar'); if (e) e.onclick = () => A.openModal('login');
+        const o = $('#gateOtra');   if (o) o.onclick = () => A.logout();
       }
     }
 
-    let loginAutoAbierto = false;
     aplicarEstado();
     window.YESEMS_AUTH.onChange(aplicarEstado);
     // Repaso periódico: si el perfil llega tarde, la banda se actualiza sola.
