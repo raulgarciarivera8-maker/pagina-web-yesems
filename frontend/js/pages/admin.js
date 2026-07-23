@@ -230,7 +230,9 @@
       } else if (err.status === 403) {
         msg = 'Tu cuenta no tiene permiso para publicar. Revisa que tu correo esté en ADMIN_EMAILS del servidor.';
       } else if (err.status === 0) {
-        msg = 'No se pudo conectar con el servidor. Si lleva rato sin uso, tarda unos segundos en despertar: inténtalo otra vez.';
+        // Puede ser fallo de conexión o el bloqueo por contenido no cargado
+        // (para no sobrescribir lo publicado). En ambos el mensaje ya es claro.
+        msg = err.message || 'No se pudo conectar con el servidor. Inténtalo otra vez.';
       }
       toast(msg, 'err');
     } finally {

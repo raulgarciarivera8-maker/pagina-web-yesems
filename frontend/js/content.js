@@ -63,7 +63,7 @@
   // Antes todo el temario y los 98 exámenes con sus respuestas viajaban en
   // archivos .js a cualquier visitante, así que el candado era decorativo.
   async function fetchDoc() {
-    if (!REAL) return null;
+    if (!REAL) { api.loadFailed = false; return null; }
     const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
 
     if (token) {
@@ -75,6 +75,7 @@
         if (r.ok) {
           const j = await r.json();
           api.conAcceso = true;
+          api.loadFailed = false;     // el servidor respondio
           return j.data || null;
         }
         // 403 = sin suscripción: es lo normal, seguimos con la vitrina.
@@ -85,14 +86,16 @@
 
     try {
       const r = await fetch(API + '/api/contenido', { signal: conCorte(20000) });
-      if (!r.ok) return null;
+      if (!r.ok) { api.loadFailed = true; return null; }
       const j = await r.json();
       api.conAcceso = false;
+      api.loadFailed = false;         // el servidor respondio (aunque este vacio)
       return j.data || null;
     } catch (e) {
       // El plan free de Render duerme el servicio: la primera petición
       // puede tardar o fallar. La página sigue con los valores de fábrica.
       console.warn('[content] no se pudo cargar el contenido:', e.message);
+      api.loadFailed = true;
       return null;
     }
   }
@@ -111,6 +114,14 @@
     if (!REAL) throw new Error('La API no está configurada.');
     const token = window.YESEMS_AUTH && window.YESEMS_AUTH.getToken();
     if (!token) throw new Error('Inicia sesión para guardar.');
+    // Si el contenido nunca se pudo cargar, lo que hay en pantalla son los
+    // valores de fábrica: guardarlos SOBRESCRIBIRÍA el contenido real. Se
+    // bloquea hasta que una carga funcione.
+    if (api.loadFailed) {
+      const err = new Error('No se pudo cargar el contenido actual, así que guardar ahora lo borraría. Recarga la página e inténtalo cuando el panel muestre el contenido publicado.');
+      err.status = 0;
+      throw err;
+    }
 
     const r = await fetch(API + '/api/contenido', {
       method: 'PUT',
@@ -162,7 +173,12 @@
       throw new Error((j.error && j.error.message) || 'Cloudinary rechazó el archivo.');
     }
     const up = await ru.json();
-    return up.secure_url;
+    // Se devuelve el public_id (p.ej. "yesems/pdfs/archivo.pdf"), NO el
+    // secure_url: los archivos son "authenticated" y no tienen URL pública.
+    // El public_id es lo que /api/archivos/abrir firma para entregarlo, y es
+    // el mismo formato con el que se guardaron los PDFs ya migrados. Guardar
+    // el secure_url dejaba los PDFs nuevos imposibles de abrir.
+    return up.public_id;
   }
 
   // Pide un enlace temporal para abrir un PDF. El archivo no tiene URL
@@ -193,6 +209,7 @@
     data: null,
     source: null,
     conAcceso: false,
+    loadFailed: false,
     defaults: DEFAULTS,
     isReal: () => REAL,
   };

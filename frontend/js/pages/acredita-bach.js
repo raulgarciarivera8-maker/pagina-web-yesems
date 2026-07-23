@@ -18,11 +18,17 @@
     e.preventDefault();
     if (a.dataset.cargando === '1') return;
 
+    const ref = a.dataset.pdf || '';
     const original = a.innerHTML;
     a.dataset.cargando = '1';
     a.style.opacity = '0.65';
     try {
-      const url = await window.YESEMS_CONTENT.abrirPDF(a.dataset.pdf);
+      // Si el admin pegó un enlace externo (http...), se abre directo. Si es
+      // un identificador de Cloudinary (yesems/pdfs/...), se pide el enlace
+      // firmado. Antes todo pasaba por abrirPDF, que destrozaba las URLs.
+      const url = /^https?:\/\//i.test(ref)
+        ? ref
+        : await window.YESEMS_CONTENT.abrirPDF(ref);
       window.open(url, '_blank', 'noopener');
     } catch (err) {
       const aviso = document.createElement('span');
@@ -593,7 +599,7 @@
     bindAreaButtons();
     applySubscription();
     renderSubStatus();
-    // El acceso pagado lo confirma js/pages/checkout.js contra Firestore.
+    // El acceso pagado lo confirma js/pages/checkout.js contra la API.
     const firstKey = AREAS[0] ? AREAS[0].key : 'matematico';
     const firstBtn = document.querySelector('.area-btn[data-key="' + firstKey + '"]');
     if (firstBtn) { firstBtn.classList.add('active'); renderAreaOrPaywall(firstKey); }
