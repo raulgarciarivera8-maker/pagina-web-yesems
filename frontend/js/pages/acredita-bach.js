@@ -262,7 +262,11 @@
   function renderSubStatus() {
     const slot = document.getElementById('subStatus');
     if (!slot) return;
-    const plan = getSub();
+    // La banda superior refleja el acceso REAL (perfil de la sesión o el
+    // registro de checkout.js), no solo la clave vieja yesems_acredita_sub.
+    // Antes mostraba "Material premium — Ver planes" aunque el usuario ya
+    // tuviera acceso pagado.
+    const plan = (tieneAccesoReal() && 'acredita-bach') || getSub();
     if (plan) {
       slot.innerHTML = `
         <div class="sub-banner active">
