@@ -82,7 +82,28 @@
   function getSub()   { try { return localStorage.getItem(SUB_KEY); } catch (e) { return null; } }
   function setSub(p)  { try { localStorage.setItem(SUB_KEY, p); } catch (e) {} }
   function clearSub() { try { localStorage.removeItem(SUB_KEY); } catch (e) {} }
-  function isUnlocked() { return !!getSub(); }
+
+  // El acceso real lo decide la sesión (accessGranted del perfil) o el registro
+  // que deja checkout.js tras confirmar el pago. Antes esta función solo miraba
+  // yesems_acredita_sub (un resto del sistema viejo), asi que aunque el usuario
+  // tuviera acceso pagado, el curso seguia mostrando el candado.
+  function tieneAccesoReal() {
+    // 1. perfil de la sesión
+    try {
+      const u = window.YESEMS_AUTH && window.YESEMS_AUTH.getUser();
+      if (u && u.accessGranted === true) {
+        if (!u.expiresAt || new Date(u.expiresAt) > new Date()) return true;
+      }
+    } catch (e) {}
+    // 2. registro local que guarda checkout.js
+    try {
+      const a = JSON.parse(localStorage.getItem('yesems_access') || '{}');
+      if (a.granted === true && (!a.expires || Date.now() < a.expires)) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  function isUnlocked() { return tieneAccesoReal() || !!getSub(); }
   let activeAreaKey = 'matematico';
 
   // ---------- helpers ----------
@@ -605,6 +626,26 @@
     if (firstBtn) { firstBtn.classList.add('active'); renderAreaOrPaywall(firstKey); }
   }
 
+  // Vuelve a dibujar el área activa. El acceso y el contenido completo llegan
+  // de forma asíncrona (tras confirmar la sesión contra el servidor); sin este
+  // repintado, la primera pintura muestra el candado y ya no se actualiza
+  // aunque el acceso se conceda.
+  function rerenderPorAcceso() {
+    if (window.YESEMS_CONTENT && window.YESEMS_CONTENT.data) {
+      const c = window.YESEMS_CONTENT.data;
+      if (c.areasOrder && c.areasOrder.length) AREAS = c.areasOrder;
+    }
+    renderSubStatus();
+    if (activeAreaKey) renderAreaOrPaywall(activeAreaKey);
+  }
+
   if (window.YESEMS_CONTENT && window.YESEMS_CONTENT.ready) window.YESEMS_CONTENT.ready.then(boot);
   else boot();
+
+  // Al confirmarse la sesión (y con ella el acceso pagado) o al recargar el
+  // contenido, se repinta para quitar el candado si corresponde.
+  if (window.YESEMS_AUTH && window.YESEMS_AUTH.onChange) {
+    window.YESEMS_AUTH.onChange(rerenderPorAcceso);
+  }
+  document.addEventListener('yesems:contenido', rerenderPorAcceso);
 })();
