@@ -160,23 +160,75 @@
   // contra el servidor: si el webhook no registró el pago, no se abre nada.
   async function handlePaymentReturn() {
     const p = new URLSearchParams(window.location.search);
-    if (p.get('payment') !== 'success') return false;
+    const estado = p.get('payment');
+    if (!estado) return false;
 
+    // Limpia el parámetro de la URL para que al recargar no reintente.
     if (window.history.replaceState) {
       window.history.replaceState({}, '', window.location.pathname + window.location.hash);
     }
 
-    const user = window.YESEMS_AUTH && window.YESEMS_AUTH.getUser();
-    if (!user) return false;
-
-    // El webhook de Mercado Pago puede tardar unos segundos en llegar:
-    // reintentamos un poco antes de darnos por vencidos.
-    for (let i = 0; i < 5; i++) {
-      if (await checkAccess()) return true;
-      await new Promise((r) => setTimeout(r, 2000));
+    if (estado === 'failure') {
+      avisoPago('El pago no se completó. Puedes intentarlo de nuevo cuando quieras.', 'err');
+      return false;
     }
-    console.warn('[checkout] el pago aún no se refleja; se reintentará al recargar.');
+    // 'pending' o 'success': en ambos hay que esperar la confirmación real.
+
+    const user = window.YESEMS_AUTH && window.YESEMS_AUTH.getUser();
+    if (!user) {
+      avisoPago('Inicia sesión con la cuenta que usaste para pagar y tu acceso aparecerá.', 'err');
+      return false;
+    }
+
+    // El webhook de Mercado Pago llega servidor-a-servidor y puede tardar:
+    // con Render dormido, hasta ~40 s. Se espera con un aviso visible en vez
+    // de dejar al alumno viendo el curso bloqueado sin explicación.
+    avisoPago('Confirmando tu pago… esto puede tardar hasta un minuto.', 'wait');
+    const inicio = Date.now();
+    const LIMITE = 60000;   // 60 segundos
+    let intento = 0;
+    while (Date.now() - inicio < LIMITE) {
+      if (await checkAccess()) {
+        avisoPago('¡Listo! Tu acceso está activo. Ya puedes ver todo el material.', 'ok');
+        return true;
+      }
+      intento++;
+      // espera creciente: 2, 3, 4, 5, 5, 5… segundos
+      await new Promise((r) => setTimeout(r, Math.min(2000 + intento * 1000, 5000)));
+    }
+    // No llegó a tiempo: no es necesariamente un fallo, el webhook puede
+    // seguir en camino. Se le da una salida clara en vez de dejarlo colgado.
+    avisoPago(
+      'Tu pago se está procesando. Si en unos minutos no ves el material, ' +
+      'recarga la página o escríbenos por WhatsApp.', 'wait', true);
     return false;
+  }
+
+  // Aviso flotante para el flujo de pago. Se crea una sola vez.
+  function avisoPago(texto, tipo, conWhats) {
+    var caja = document.getElementById('yesems-pago-aviso');
+    if (!caja) {
+      caja = document.createElement('div');
+      caja.id = 'yesems-pago-aviso';
+      caja.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
+        'max-width:92%;z-index:9999;padding:14px 20px;border-radius:12px;font:15px/1.5 ' +
+        '-apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.18);' +
+        'display:flex;gap:12px;align-items:center;text-align:left';
+      document.body.appendChild(caja);
+    }
+    var colores = {
+      wait: 'background:#0a1e3f;color:#fff',
+      ok:   'background:#e6f7ea;color:#1c6b3a;border:1px solid #b6e3c5',
+      err:  'background:#fdeaea;color:#a33;border:1px solid #f2c2c2',
+    };
+    caja.style.cssText += ';' + (colores[tipo] || colores.wait);
+    var wa = conWhats
+      ? ' <a href="' + CONFIG.whatsapp + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;font-weight:600">WhatsApp</a>'
+      : '';
+    caja.innerHTML = (tipo === 'wait' ? '<span style="flex:0 0 auto">⏳</span>' : '') +
+      '<span>' + texto + wa + '</span>';
+    // Los mensajes finales (ok/err) se ocultan solos; el de espera se queda.
+    if (tipo !== 'wait') setTimeout(function () { if (caja) caja.remove(); }, 9000);
   }
 
   // ─── BOTONES DE COMPRA ────────────────────────

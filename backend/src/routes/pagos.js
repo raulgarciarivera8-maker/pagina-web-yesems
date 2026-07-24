@@ -73,6 +73,13 @@ router.post('/preferencia', requireAuth, async (req, res, next) => {
     // así nadie puede generar un pago a nombre de otra persona.
     const { email, _id } = req.user;
 
+    // URL a la que Mercado Pago avisará del pago. Se prefiere API_URL, pero si
+    // no está configurada se deriva del propio host de la petición: así el
+    // webhook funciona aunque falte esa variable, que era el error más fácil
+    // de cometer y dejaba los pagos sin desbloquear.
+    const base = API || `${req.protocol}://${req.get('host')}`;
+    const webhookUrl = `${base}/api/pagos/webhook`;
+
     const preferencia = {
       items: [{
         id: planKey,
@@ -90,7 +97,7 @@ router.post('/preferencia', requireAuth, async (req, res, next) => {
       },
       auto_return: 'approved',
       external_reference: JSON.stringify({ uid: String(_id), email, plan: planKey }),
-      notification_url: `${API}/api/pagos/webhook`,
+      notification_url: webhookUrl,
       payment_methods: { excluded_payment_types: [], installments: 1 },
     };
 
@@ -157,6 +164,14 @@ router.post('/webhook', async (req, res) => {
     const pago = await r.json();
     if (pago.status !== 'approved') {
       return res.status(200).json({ ok: true, status: pago.status });
+    }
+
+    // Idempotencia: Mercado Pago reenvía el mismo aviso varias veces. Si este
+    // pago ya se registró, no se vuelve a tocar la cuenta (evita reiniciar la
+    // fecha de expiración en cada reenvío).
+    const yaProcesado = await collections.users().findOne({ paymentId: String(pago.id) });
+    if (yaProcesado) {
+      return res.status(200).json({ ok: true, alreadyProcessed: true });
     }
 
     let uid = null;
